@@ -9,11 +9,13 @@ import { furniImageUrl, debounce } from "@/lib/utils";
 interface SearchBarProps {
   placeholder?: string;
   className?: string;
+  onSelect?: (item: FurniItem) => void;
 }
 
 export function SearchBar({
   placeholder = "Search furni...",
   className = "",
+  onSelect,
 }: SearchBarProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -58,10 +60,14 @@ export function SearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleSelect(classname: string) {
+  function handleSelect(item: FurniItem) {
     setIsOpen(false);
     setQuery("");
-    router.push(`/furni/${encodeURIComponent(classname)}`);
+    if (onSelect) {
+      onSelect(item);
+    } else {
+      router.push(`/furni/${encodeURIComponent(item.classname)}`);
+    }
   }
 
   return (
@@ -101,7 +107,7 @@ export function SearchBar({
           {results.map((item) => (
             <button
               key={item.classname}
-              onClick={() => handleSelect(item.classname)}
+              onClick={() => handleSelect(item)}
               className="w-full flex items-center gap-3 px-3 py-2 hover:bg-habbo-card transition-colors text-left"
             >
               <img
@@ -121,6 +127,11 @@ export function SearchBar({
               {item.rare && (
                 <span className="text-[9px] px-1.5 py-0.5 bg-habbo-gold/20 text-habbo-gold rounded">
                   RARE
+                </span>
+              )}
+              {onSelect && (
+                <span className="text-[9px] px-1.5 py-0.5 bg-habbo-cyan/20 text-habbo-cyan rounded">
+                  +
                 </span>
               )}
             </button>

@@ -32,7 +32,7 @@ function mapMarketResponse(raw: RawMarketResponse, hotel: HotelDomain): MarketDa
     revision: raw.Revision,
     furniType: raw.FurniType,
     marketData: {
-      history: raw.marketData.history.map(
+      history: (raw.marketData?.history ?? []).map(
         ([avgPrice, soldItems, creditSum, openOffers, timestamp]): HistoryEntry => ({
           avgPrice,
           soldItems,
@@ -41,8 +41,8 @@ function mapMarketResponse(raw: RawMarketResponse, hotel: HotelDomain): MarketDa
           timestamp,
         })
       ),
-      averagePrice: raw.marketData.averagePrice,
-      lastUpdated: raw.marketData.lastUpdated,
+      averagePrice: raw.marketData?.averagePrice ?? 0,
+      lastUpdated: raw.marketData?.lastUpdated ?? "",
     },
     hotelDomain: hotel,
   };
@@ -57,6 +57,10 @@ export async function fetchMarketHistory(
   if (days) params.set("days", String(days));
   const res = await fetch(`/api/market/history?${params}`);
   if (!res.ok) throw new Error(`Failed to fetch market history: ${res.status}`);
-  const rawData: RawMarketResponse[] = await res.json();
-  return rawData.map((item) => mapMarketResponse(item, hotel));
+  const json: unknown = await res.json();
+  if (!Array.isArray(json)) return [];
+  const rawData = json as RawMarketResponse[];
+  return rawData
+    .filter((item) => item && item.ClassName && item.marketData)
+    .map((item) => mapMarketResponse(item, hotel));
 }

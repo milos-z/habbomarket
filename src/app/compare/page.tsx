@@ -14,6 +14,7 @@ import { SearchBar } from "@/components/common/SearchBar";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import type { FurniItem } from "@/lib/types";
 
 const PALETTE = [
   CHART_COLORS.primary,
@@ -30,8 +31,12 @@ interface MarketEntry {
 }
 
 export default function ComparePage() {
-  const { items, removeItem, clearItems } = useCompare();
+  const { items, addItem, removeItem, clearItems } = useCompare();
   const { t } = useLanguage();
+
+  const handleAddFromSearch = useCallback((item: FurniItem) => {
+    addItem({ classname: item.classname, name: item.name });
+  }, [addItem]);
   const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
   const [entries, setEntries] = useState<MarketEntry[]>([]);
 
@@ -121,6 +126,7 @@ export default function ComparePage() {
           <SearchBar
             placeholder={t.compare.searchToAdd}
             className="max-w-sm mx-auto"
+            onSelect={handleAddFromSearch}
           />
         </PixelCard>
       )}
@@ -166,6 +172,7 @@ export default function ComparePage() {
             <SearchBar
               placeholder={t.compare.addFurni}
               className="flex-1 min-w-[200px]"
+              onSelect={handleAddFromSearch}
             />
           )}
         </div>
