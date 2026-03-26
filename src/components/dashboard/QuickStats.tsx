@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { HotelDomain } from "@/lib/types";
 import type { FurniItem } from "@/lib/types";
 import { PixelCard } from "@/components/common/PixelCard";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export function QuickStats() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     totalItems: 0,
     tradeableItems: 0,
@@ -37,10 +39,10 @@ export function QuickStats() {
   }, []);
 
   const cards = [
-    { label: "Total Furni", value: stats.totalItems.toLocaleString(), color: "text-habbo-cyan" },
-    { label: "Tradeable", value: stats.tradeableItems.toLocaleString(), color: "text-habbo-green" },
-    { label: "Rares", value: stats.rareItems.toLocaleString(), color: "text-habbo-gold" },
-    { label: "Categories", value: stats.categories.toString(), color: "text-habbo-purple" },
+    { label: t.dashboard.totalFurni, value: stats.totalItems.toLocaleString(), color: "text-habbo-cyan" },
+    { label: t.dashboard.tradeable, value: stats.tradeableItems.toLocaleString(), color: "text-habbo-green" },
+    { label: t.dashboard.rares, value: stats.rareItems.toLocaleString(), color: "text-habbo-gold" },
+    { label: t.dashboard.categories, value: stats.categories.toString(), color: "text-habbo-purple" },
   ];
 
   return (

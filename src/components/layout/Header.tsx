@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCompare } from "@/components/providers/CompareProvider";
-
-const NAV_LINKS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/catalog", label: "Catalog" },
-  { href: "/compare", label: "Compare" },
-];
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { LanguageSelector } from "@/components/common/LanguageSelector";
 
 export function Header() {
   const pathname = usePathname();
   const { items } = useCompare();
+  const { t } = useLanguage();
+
+  const navLinks = [
+    { href: "/", label: t.nav.dashboard },
+    { href: "/catalog", label: t.nav.catalog },
+    { href: "/compare", label: t.nav.compare },
+  ];
 
   return (
     <header className="bg-habbo-nav border-b border-habbo-border sticky top-0 z-50">
@@ -28,35 +31,38 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const isActive =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`
-                  relative px-3 py-2 text-sm rounded transition-colors
-                  ${
-                    isActive
-                      ? "text-habbo-cyan bg-habbo-card"
-                      : "text-habbo-text-dim hover:text-habbo-text hover:bg-habbo-card/50"
-                  }
-                `}
-              >
-                {link.label}
-                {link.href === "/compare" && items.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-habbo-gold text-habbo-bg text-[9px] font-bold rounded-full flex items-center justify-center">
-                    {items.length}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`
+                    relative px-3 py-2 text-sm rounded transition-colors
+                    ${
+                      isActive
+                        ? "text-habbo-cyan bg-habbo-card"
+                        : "text-habbo-text-dim hover:text-habbo-text hover:bg-habbo-card/50"
+                    }
+                  `}
+                >
+                  {link.label}
+                  {link.href === "/compare" && items.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-habbo-gold text-habbo-bg text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {items.length}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+          <LanguageSelector />
+        </div>
       </div>
     </header>
   );

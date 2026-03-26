@@ -7,8 +7,10 @@ import { DEFAULT_FILTERS, ITEMS_PER_PAGE } from "@/lib/constants";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { FurniGrid } from "@/components/catalog/FurniGrid";
 import { Pagination } from "@/components/common/Pagination";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export default function CatalogPage() {
+  const { t } = useLanguage();
   const [allItems, setAllItems] = useState<FurniItem[]>([]);
   const [filters, setFilters] = useState<CatalogFilters>(DEFAULT_FILTERS);
   const [loading, setLoading] = useState(true);
@@ -94,10 +96,10 @@ export default function CatalogPage() {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="mb-6">
         <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
-          Furni Catalog
+          {t.catalog.title}
         </h1>
         <p className="text-sm text-habbo-text-dim mt-1">
-          Browse and discover furniture across Habbo hotels
+          {t.catalog.subtitle}
         </p>
       </div>
 
@@ -115,10 +117,9 @@ export default function CatalogPage() {
         </aside>
 
         <div className="flex-1 min-w-0">
-          {/* Mobile filters */}
           <details className="md:hidden mb-4 bg-habbo-card pixel-border rounded-lg">
             <summary className="px-4 py-3 text-sm text-habbo-text-dim cursor-pointer">
-              Filters & Sort
+              {t.catalog.filtersAndSort}
             </summary>
             <div className="px-4 pb-4">
               <FilterPanel

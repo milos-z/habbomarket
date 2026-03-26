@@ -2,6 +2,7 @@
 
 import type { FurniItem } from "@/lib/types";
 import { FurniCard } from "./FurniCard";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface FurniGridProps {
   items: FurniItem[];
@@ -9,6 +10,8 @@ interface FurniGridProps {
 }
 
 export function FurniGrid({ items, loading }: FurniGridProps) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -31,10 +34,10 @@ export function FurniGrid({ items, loading }: FurniGridProps) {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="text-4xl mb-4 opacity-50">🔍</div>
         <h3 className="font-[family-name:var(--font-pixel)] text-sm text-habbo-text-dim mb-2">
-          No furni found
+          {t.catalog.noFurniFound}
         </h3>
         <p className="text-xs text-habbo-text-dim/60">
-          Try adjusting your filters or search terms.
+          {t.catalog.noFurniHint}
         </p>
       </div>
     );

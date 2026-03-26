@@ -2,9 +2,9 @@
 
 import { HotelDomain, SortField, SortDirection } from "@/lib/types";
 import type { CatalogFilters } from "@/lib/types";
-import { CATEGORY_LABELS } from "@/lib/constants";
 import { HotelSelector } from "@/components/common/HotelSelector";
 import { PixelButton } from "@/components/common/PixelButton";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface FilterPanelProps {
   filters: CatalogFilters;
@@ -21,11 +21,13 @@ export function FilterPanel({
   onChange,
   totalResults,
 }: FilterPanelProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-4">
       <div>
         <label className="text-[10px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider mb-2 block">
-          Hotel
+          {t.filters.hotel}
         </label>
         <HotelSelector
           value={filters.hotel}
@@ -35,30 +37,30 @@ export function FilterPanel({
 
       <div>
         <label className="text-[10px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider mb-2 block">
-          Search
+          {t.filters.search}
         </label>
         <input
           type="text"
           value={filters.search}
           onChange={(e) => onChange({ search: e.target.value, page: 1 })}
-          placeholder="Name or classname..."
+          placeholder={t.filters.searchPlaceholder}
           className="w-full px-3 py-2 bg-habbo-input border border-habbo-border rounded text-sm text-habbo-text placeholder:text-habbo-text-dim/50 focus:outline-none focus:border-habbo-cyan/50"
         />
       </div>
 
       <div>
         <label className="text-[10px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider mb-2 block">
-          Category
+          {t.filters.category}
         </label>
         <select
           value={filters.category}
           onChange={(e) => onChange({ category: e.target.value, page: 1 })}
           className="w-full px-3 py-2 bg-habbo-input border border-habbo-border rounded text-sm text-habbo-text focus:outline-none focus:border-habbo-cyan/50"
         >
-          <option value="">All Categories</option>
+          <option value="">{t.filters.allCategories}</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
-              {CATEGORY_LABELS[cat] || cat}
+              {t.categories[cat] || cat}
             </option>
           ))}
         </select>
@@ -66,14 +68,14 @@ export function FilterPanel({
 
       <div>
         <label className="text-[10px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider mb-2 block">
-          Furni Line
+          {t.filters.furniLine}
         </label>
         <select
           value={filters.furniline}
           onChange={(e) => onChange({ furniline: e.target.value, page: 1 })}
           className="w-full px-3 py-2 bg-habbo-input border border-habbo-border rounded text-sm text-habbo-text focus:outline-none focus:border-habbo-cyan/50"
         >
-          <option value="">All Lines</option>
+          <option value="">{t.filters.allLines}</option>
           {furnilines.map((line) => (
             <option key={line} value={line}>
               {line}
@@ -89,7 +91,7 @@ export function FilterPanel({
           onClick={() => onChange({ rareOnly: !filters.rareOnly, page: 1 })}
           className="flex-1"
         >
-          {filters.rareOnly ? "★ Rare" : "Rare"}
+          {filters.rareOnly ? t.filters.rareActive : t.filters.rare}
         </PixelButton>
         <PixelButton
           variant={filters.tradeableOnly ? "primary" : "secondary"}
@@ -99,18 +101,18 @@ export function FilterPanel({
           }
           className="flex-1"
         >
-          Tradeable
+          {t.filters.tradeable}
         </PixelButton>
       </div>
 
       <div>
         <label className="text-[10px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider mb-2 block">
-          Sort By
+          {t.filters.sortBy}
         </label>
         <div className="flex gap-1 flex-wrap">
           {[
-            { field: SortField.NAME, label: "Name" },
-            { field: SortField.PRICE, label: "Price" },
+            { field: SortField.NAME, label: t.filters.name },
+            { field: SortField.PRICE, label: t.filters.price },
           ].map(({ field, label }) => (
             <PixelButton
               key={field}
@@ -145,7 +147,7 @@ export function FilterPanel({
           <span className="text-habbo-cyan font-mono font-bold">
             {totalResults.toLocaleString()}
           </span>{" "}
-          items found
+          {t.catalog.itemsFound}
         </div>
       </div>
     </div>

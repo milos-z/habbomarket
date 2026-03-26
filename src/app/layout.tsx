@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Press_Start_2P, Inter, JetBrains_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { CompareProvider } from "@/components/providers/CompareProvider";
+import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import "./globals.css";
 
 const pixelFont = Press_Start_2P({
@@ -21,9 +22,9 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HabboMarket - Marketplace Analysis Dashboard",
+  title: "HabboMarket - Marktplatz Analyse Dashboard",
   description:
-    "Analyze Habbo marketplace prices, compare furni across hotels, and track trends with pixel-perfect charts.",
+    "Analysiere Habbo Marktplatz-Preise, vergleiche Möbel zwischen Hotels und verfolge Trends mit Pixel-perfekten Charts.",
 };
 
 export default function RootLayout({
@@ -33,14 +34,16 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="de"
       className={`${pixelFont.variable} ${bodyFont.variable} ${monoFont.variable} h-full`}
     >
       <body className="min-h-full flex flex-col font-[family-name:var(--font-body)]">
-        <CompareProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-        </CompareProvider>
+        <LanguageProvider>
+          <CompareProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+          </CompareProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

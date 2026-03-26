@@ -7,6 +7,7 @@ import type { HistoryEntry } from "@/lib/types";
 import { formatDate, formatCredits } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { ensureChartRegistered } from "./ChartSetup";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface PriceChartProps {
   history: HistoryEntry[];
@@ -17,18 +18,20 @@ interface PriceChartProps {
 
 export function PriceChart({
   history,
-  label = "Avg Price",
+  label,
   color = CHART_COLORS.primary,
   height = 300,
 }: PriceChartProps) {
   ensureChartRegistered();
+  const { t } = useLanguage();
+  const chartLabel = label ?? t.furniDetail.avgPrice;
 
   const data = useMemo(
     () => ({
       labels: history.map((h) => formatDate(h.timestamp)),
       datasets: [
         {
-          label,
+          label: chartLabel,
           data: history.map((h) => h.avgPrice),
           borderColor: color,
           backgroundColor: `${color}20`,
@@ -41,8 +44,10 @@ export function PriceChart({
         },
       ],
     }),
-    [history, label, color]
+    [history, chartLabel, color]
   );
+
+  const creditsWord = t.furniDetail.credits;
 
   const options: ChartOptions<"line"> = useMemo(
     () => ({
@@ -59,7 +64,7 @@ export function PriceChart({
           bodyFont: { family: "JetBrains Mono, monospace", size: 12 },
           padding: 10,
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${formatCredits(ctx.parsed.y ?? 0)} credits`,
+            label: (ctx) => `${ctx.dataset.label}: ${formatCredits(ctx.parsed.y ?? 0)} ${creditsWord}`,
           },
         },
       },
@@ -78,7 +83,7 @@ export function PriceChart({
         },
       },
     }),
-    []
+    [creditsWord]
   );
 
   return (

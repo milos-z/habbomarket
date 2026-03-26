@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { furniImageUrl, formatCredits } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface MoverItem {
   classname: string;
@@ -24,6 +25,7 @@ const ITEMS_TO_CHECK = [
 ];
 
 export function PriceMovers() {
+  const { t } = useLanguage();
   const [movers, setMovers] = useState<MoverItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,7 +76,7 @@ export function PriceMovers() {
   return (
     <PixelCard className="p-4">
       <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-gold uppercase tracking-wider mb-4">
-        Price Movers
+        {t.dashboard.priceMovers}
       </h2>
 
       {loading ? (
@@ -85,7 +87,7 @@ export function PriceMovers() {
         </div>
       ) : movers.length === 0 ? (
         <p className="text-xs text-habbo-text-dim text-center py-4">
-          Loading market data...
+          {t.dashboard.loadingMarketData}
         </p>
       ) : (
         <div className="space-y-1">

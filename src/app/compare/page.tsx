@@ -13,6 +13,7 @@ import { HotelSelector } from "@/components/common/HotelSelector";
 import { SearchBar } from "@/components/common/SearchBar";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const PALETTE = [
   CHART_COLORS.primary,
@@ -30,6 +31,7 @@ interface MarketEntry {
 
 export default function ComparePage() {
   const { items, removeItem, clearItems } = useCompare();
+  const { t } = useLanguage();
   const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
   const [entries, setEntries] = useState<MarketEntry[]>([]);
 
@@ -76,49 +78,53 @@ export default function ComparePage() {
       color: PALETTE[idx % PALETTE.length],
     }));
 
+  const catalogLink = (
+    <Link href="/catalog" className="text-habbo-cyan hover:underline">
+      {t.nav.catalog}
+    </Link>
+  );
+
+  const hintParts = t.compare.noItemsHint.split("{catalog}");
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
-            Compare Furni
+            {t.compare.title}
           </h1>
           <p className="text-sm text-habbo-text-dim mt-1">
-            Compare up to 4 items side-by-side
+            {t.compare.subtitle}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <HotelSelector value={hotel} onChange={setHotel} />
           {items.length > 0 && (
             <PixelButton variant="ghost" size="sm" onClick={clearItems}>
-              Clear All
+              {t.compare.clearAll}
             </PixelButton>
           )}
         </div>
       </div>
 
-      {/* Add items prompt */}
       {items.length === 0 && (
         <PixelCard className="p-8 text-center">
           <div className="text-4xl mb-4 opacity-40">📊</div>
           <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-3">
-            No items to compare
+            {t.compare.noItems}
           </h2>
           <p className="text-sm text-habbo-text-dim/70 mb-4 max-w-md mx-auto">
-            Search for furni below or go to the{" "}
-            <Link href="/catalog" className="text-habbo-cyan hover:underline">
-              Catalog
-            </Link>{" "}
-            to add items to your compare list.
+            {hintParts[0]}
+            {catalogLink}
+            {hintParts[1]}
           </p>
           <SearchBar
-            placeholder="Search furni to add..."
+            placeholder={t.compare.searchToAdd}
             className="max-w-sm mx-auto"
           />
         </PixelCard>
       )}
 
-      {/* Selected items strip */}
       {items.length > 0 && (
         <div className="flex flex-wrap gap-3">
           {entries.map((entry, idx) => (
@@ -144,7 +150,7 @@ export default function ComparePage() {
                 </Link>
                 {entry.data && (
                   <div className="text-[10px] font-mono text-habbo-text-dim">
-                    {formatCredits(entry.data.marketData.averagePrice)}c avg
+                    {formatCredits(entry.data.marketData.averagePrice)}c {t.compare.avgLabel}
                   </div>
                 )}
               </div>
@@ -158,52 +164,50 @@ export default function ComparePage() {
           ))}
           {items.length < 4 && (
             <SearchBar
-              placeholder="+ Add furni..."
+              placeholder={t.compare.addFurni}
               className="flex-1 min-w-[200px]"
             />
           )}
         </div>
       )}
 
-      {/* Compare chart */}
       {chartDatasets.length > 0 && (
         <PixelCard className="p-4">
           <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-            Price Comparison (90 days)
+            {t.compare.priceComparison}
           </h2>
           <CompareChart datasets={chartDatasets} height={400} />
         </PixelCard>
       )}
 
-      {/* Metrics table */}
       {entries.some((e) => e.data) && (
         <PixelCard className="p-4 overflow-x-auto">
           <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-            Metrics Comparison
+            {t.compare.metricsComparison}
           </h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-habbo-border">
                 <th className="text-left py-2 text-xs text-habbo-text-dim font-normal">
-                  Item
+                  {t.compare.item}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  Avg Price
+                  {t.furniDetail.avgPrice}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  Change
+                  {t.furniDetail.change}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  Volume
+                  {t.furniDetail.volume}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  Offers
+                  {t.furniDetail.offers}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  High
+                  {t.furniDetail.high}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
-                  Low
+                  {t.furniDetail.low}
                 </th>
               </tr>
             </thead>
@@ -231,8 +235,7 @@ export default function ComparePage() {
                           <div
                             className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{
-                              backgroundColor:
-                                PALETTE[idx % PALETTE.length],
+                              backgroundColor: PALETTE[idx % PALETTE.length],
                             }}
                           />
                           <img

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
 import { furniImageUrl } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const SPOTLIGHT_ITEMS = [
   "throne",
@@ -20,6 +21,7 @@ const SPOTLIGHT_ITEMS = [
 ];
 
 export function SpotlightCarousel() {
+  const { t } = useLanguage();
   const [items, setItems] = useState<FurniItem[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -85,7 +87,7 @@ export function SpotlightCarousel() {
 
         <div className="flex-1 min-w-0">
           <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-gold uppercase tracking-wider mb-1">
-            Spotlight
+            {t.dashboard.spotlight}
           </div>
           <Link
             href={`/furni/${encodeURIComponent(current.classname)}`}

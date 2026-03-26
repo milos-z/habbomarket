@@ -6,6 +6,7 @@ import type { FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
 import { furniImageUrl } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const POPULAR_CLASSNAMES = [
   "throne",
@@ -19,6 +20,7 @@ const POPULAR_CLASSNAMES = [
 ];
 
 export function TrendingFurni() {
+  const { t } = useLanguage();
   const [items, setItems] = useState<FurniItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +49,7 @@ export function TrendingFurni() {
   return (
     <PixelCard className="p-4">
       <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-cyan uppercase tracking-wider mb-4">
-        Popular Items
+        {t.dashboard.popularItems}
       </h2>
 
       {loading ? (

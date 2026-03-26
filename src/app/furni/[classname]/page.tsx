@@ -14,6 +14,7 @@ import { PriceChart } from "@/components/charts/PriceChart";
 import { VolumeChart } from "@/components/charts/VolumeChart";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 type DayRange = "7" | "30" | "90" | "all";
 
@@ -24,6 +25,7 @@ export default function FurniDetailPage({
 }) {
   const { classname } = use(params);
   const decoded = decodeURIComponent(classname);
+  const { t } = useLanguage();
 
   const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
   const [days, setDays] = useState<DayRange>("90");
@@ -48,14 +50,14 @@ export default function FurniDetailPage({
       if (results.length > 0) {
         setData(results[0]);
       } else {
-        setError("No marketplace data found for this item.");
+        setError(t.furniDetail.noDataFound);
       }
     } catch {
-      setError("Failed to load marketplace data. The item might not be tradeable.");
+      setError(t.furniDetail.loadFailed);
     } finally {
       setLoading(false);
     }
-  }, [decoded, hotel, days]);
+  }, [decoded, hotel, days, t]);
 
   const loadComparison = useCallback(async () => {
     try {
@@ -94,12 +96,11 @@ export default function FurniDetailPage({
           href="/catalog"
           className="text-xs text-habbo-text-dim hover:text-habbo-cyan transition-colors"
         >
-          ← Back to Catalog
+          {t.furniDetail.backToCatalog}
         </Link>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left: Furni info */}
         <div className="lg:w-72 shrink-0">
           <PixelCard className="p-5 text-center" gold>
             <div className="w-full h-32 flex items-center justify-center mb-4">
@@ -117,15 +118,15 @@ export default function FurniDetailPage({
             </p>
             <div className="text-xs text-habbo-text-dim space-y-1 text-left">
               <div className="flex justify-between">
-                <span>Category</span>
+                <span>{t.furniDetail.categoryLabel}</span>
                 <span className="text-habbo-text">{data?.category ?? "—"}</span>
               </div>
               <div className="flex justify-between">
-                <span>Line</span>
+                <span>{t.furniDetail.lineLabel}</span>
                 <span className="text-habbo-text">{data?.line ?? "—"}</span>
               </div>
               <div className="flex justify-between">
-                <span>Type</span>
+                <span>{t.furniDetail.typeLabel}</span>
                 <span className="text-habbo-text">{data?.furniType ?? "—"}</span>
               </div>
             </div>
@@ -145,17 +146,16 @@ export default function FurniDetailPage({
                   }
                 }}
               >
-                {inCompare ? "✓ In Compare" : "+ Add to Compare"}
+                {inCompare ? t.furniDetail.inCompare : t.furniDetail.addToCompare}
               </PixelButton>
             </div>
           </PixelCard>
 
-          {/* Stats cards */}
           {data && (
             <div className="grid grid-cols-2 gap-2 mt-3">
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  Avg Price
+                  {t.furniDetail.avgPrice}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-cyan mt-1">
                   {formatCredits(data.marketData.averagePrice)}
@@ -163,7 +163,7 @@ export default function FurniDetailPage({
               </PixelCard>
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  Change
+                  {t.furniDetail.change}
                 </div>
                 <div
                   className={`text-sm font-mono font-bold mt-1 ${
@@ -179,7 +179,7 @@ export default function FurniDetailPage({
               </PixelCard>
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  Volume
+                  {t.furniDetail.volume}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-gold mt-1">
                   {formatCredits(totalVolume)}
@@ -187,7 +187,7 @@ export default function FurniDetailPage({
               </PixelCard>
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  Offers
+                  {t.furniDetail.offers}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-purple mt-1">
                   {latestOffers}
@@ -195,7 +195,7 @@ export default function FurniDetailPage({
               </PixelCard>
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  High
+                  {t.furniDetail.high}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-green mt-1">
                   {formatCredits(maxPrice)}
@@ -203,7 +203,7 @@ export default function FurniDetailPage({
               </PixelCard>
               <PixelCard className="p-3 text-center">
                 <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                  Low
+                  {t.furniDetail.low}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-red mt-1">
                   {formatCredits(minPrice)}
@@ -213,7 +213,6 @@ export default function FurniDetailPage({
           )}
         </div>
 
-        {/* Right: Charts */}
         <div className="flex-1 min-w-0 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <HotelSelector value={hotel} onChange={setHotel} />
@@ -225,18 +224,16 @@ export default function FurniDetailPage({
                   size="sm"
                   onClick={() => setDays(d)}
                 >
-                  {d === "all" ? "All" : `${d}d`}
+                  {d === "all" ? t.furniDetail.allTime : `${d}d`}
                 </PixelButton>
               ))}
             </div>
           </div>
 
           {loading ? (
-            <div className="space-y-4">
-              <PixelCard className="p-6 h-[340px] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-habbo-cyan/30 border-t-habbo-cyan rounded-full animate-spin" />
-              </PixelCard>
-            </div>
+            <PixelCard className="p-6 h-[340px] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-habbo-cyan/30 border-t-habbo-cyan rounded-full animate-spin" />
+            </PixelCard>
           ) : error ? (
             <PixelCard className="p-8 text-center">
               <div className="text-2xl mb-3 opacity-50">📉</div>
@@ -246,14 +243,14 @@ export default function FurniDetailPage({
             <>
               <PixelCard className="p-4">
                 <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-                  Price History
+                  {t.furniDetail.priceHistory}
                 </h2>
                 <PriceChart history={history} />
               </PixelCard>
 
               <PixelCard className="p-4">
                 <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-                  Trade Volume
+                  {t.furniDetail.tradeVolume}
                 </h2>
                 <VolumeChart history={history} />
               </PixelCard>
@@ -261,7 +258,7 @@ export default function FurniDetailPage({
               {comData && deData && (
                 <PixelCard className="p-4">
                   <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-                    .COM vs .DE Comparison
+                    {t.furniDetail.comVsDeComparison}
                   </h2>
                   <CompareChart
                     datasets={[
