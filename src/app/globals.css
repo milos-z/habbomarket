@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-habbo-bg: #0e1326;
+  --color-habbo-card: #1b2a4a;
+  --color-habbo-card-hover: #243562;
+  --color-habbo-border: #2a3f6e;
+  --color-habbo-gold: #f5c842;
+  --color-habbo-cyan: #00d4ff;
+  --color-habbo-green: #3dd68c;
+  --color-habbo-red: #ff4757;
+  --color-habbo-text: #e8ecf4;
+  --color-habbo-text-dim: #8899b8;
+  --color-habbo-nav: #111a33;
+  --color-habbo-input: #162040;
+  --color-habbo-purple: #a66bff;
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-habbo-border) var(--color-habbo-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-habbo-bg);
+  color: var(--color-habbo-text);
+  font-family: var(--font-body);
+}
+
+.pixel-border {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.08),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.3),
+    2px 2px 0 rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-habbo-border);
+}
+
+.pixel-border-gold {
+  box-shadow:
+    inset 1px 1px 0 rgba(245, 200, 66, 0.15),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.3),
+    2px 2px 0 rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-habbo-gold);
+}
+
+.pixel-glow {
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2), 0 0 24px rgba(0, 212, 255, 0.05);
+}
+
+.pixel-glow-gold {
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.25), 0 0 24px rgba(245, 200, 66, 0.08);
+}
+
+.pixel-text-shadow {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+@keyframes pixel-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pixel-pulse {
+  animation: pixel-pulse 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
 }
