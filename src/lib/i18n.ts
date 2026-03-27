@@ -27,6 +27,12 @@ export interface Translations {
     tradeable: string;
     rares: string;
     categories: string;
+    marketSummary: string;
+    marketUp: string;
+    marketDown: string;
+    marketStable: string;
+    avgChange: string;
+    itemsTracked: string;
   };
   catalog: {
     title: string;
@@ -71,6 +77,9 @@ export interface Translations {
     typeLabel: string;
     allTime: string;
     credits: string;
+    sixMonths: string;
+    oneYear: string;
+    exportCSV: string;
   };
   compare: {
     title: string;
@@ -109,6 +118,9 @@ export interface Translations {
     totalItems: string;
     estimatedValue: string;
     remove: string;
+    buyPrice: string;
+    profitLoss: string;
+    totalProfit: string;
   };
 }
 
@@ -135,6 +147,12 @@ const de: Translations = {
     tradeable: "Handelbar",
     rares: "Seltene",
     categories: "Kategorien",
+    marketSummary: "Marktübersicht",
+    marketUp: "Markt steigt",
+    marketDown: "Markt fällt",
+    marketStable: "Markt stabil",
+    avgChange: "Ø Änderung",
+    itemsTracked: "Artikel beobachtet",
   },
   catalog: {
     title: "Möbel-Katalog",
@@ -180,6 +198,9 @@ const de: Translations = {
     typeLabel: "Typ",
     allTime: "Alle",
     credits: "Credits",
+    sixMonths: "6M",
+    oneYear: "1J",
+    exportCSV: "CSV Export",
   },
   compare: {
     title: "Möbel vergleichen",
@@ -236,6 +257,9 @@ const de: Translations = {
     totalItems: "Gesamt Stück",
     estimatedValue: "Geschätzter Wert",
     remove: "Entfernen",
+    buyPrice: "Kaufpreis",
+    profitLoss: "Gewinn/Verlust",
+    totalProfit: "Gesamt G/V",
   },
 };
 
@@ -262,6 +286,12 @@ const en: Translations = {
     tradeable: "Tradeable",
     rares: "Rares",
     categories: "Categories",
+    marketSummary: "Market Overview",
+    marketUp: "Market trending up",
+    marketDown: "Market trending down",
+    marketStable: "Market stable",
+    avgChange: "Avg Change",
+    itemsTracked: "Items tracked",
   },
   catalog: {
     title: "Furni Catalog",
@@ -307,6 +337,9 @@ const en: Translations = {
     typeLabel: "Type",
     allTime: "All",
     credits: "credits",
+    sixMonths: "6M",
+    oneYear: "1Y",
+    exportCSV: "CSV Export",
   },
   compare: {
     title: "Compare Furni",
@@ -363,6 +396,9 @@ const en: Translations = {
     totalItems: "Total Items",
     estimatedValue: "Est. Value",
     remove: "Remove",
+    buyPrice: "Buy Price",
+    profitLoss: "Profit/Loss",
+    totalProfit: "Total P/L",
   },
 };
 
