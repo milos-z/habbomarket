@@ -10,6 +10,8 @@ export interface Translations {
     dashboard: string;
     catalog: string;
     compare: string;
+    favorites: string;
+    portfolio: string;
   };
   dashboard: {
     title: string;
@@ -86,6 +88,27 @@ export interface Translations {
   categories: Record<string, string>;
   common: {
     searchFurni: string;
+    recentSearches: string;
+    clearHistory: string;
+  };
+  favorites: {
+    title: string;
+    subtitle: string;
+    empty: string;
+    emptyHint: string;
+    addFavorite: string;
+    removeFavorite: string;
+  };
+  portfolio: {
+    title: string;
+    subtitle: string;
+    empty: string;
+    emptyHint: string;
+    addToPortfolio: string;
+    quantity: string;
+    totalItems: string;
+    estimatedValue: string;
+    remove: string;
   };
 }
 
@@ -94,6 +117,8 @@ const de: Translations = {
     dashboard: "Dashboard",
     catalog: "Katalog",
     compare: "Vergleichen",
+    favorites: "Favoriten",
+    portfolio: "Portfolio",
   },
   dashboard: {
     title: "HabboMarket",
@@ -190,6 +215,27 @@ const de: Translations = {
   },
   common: {
     searchFurni: "Möbel suchen...",
+    recentSearches: "Letzte Suchen",
+    clearHistory: "Verlauf löschen",
+  },
+  favorites: {
+    title: "Favoriten",
+    subtitle: "Deine gespeicherten Lieblings-Möbel",
+    empty: "Keine Favoriten",
+    emptyHint: "Klicke auf das Herz-Symbol bei einem Möbelstück, um es zu speichern.",
+    addFavorite: "Favorit hinzufügen",
+    removeFavorite: "Favorit entfernen",
+  },
+  portfolio: {
+    title: "Portfolio",
+    subtitle: "Verfolge deine Möbel und deren Gesamtwert",
+    empty: "Portfolio ist leer",
+    emptyHint: "Füge Möbel über den Katalog oder die Detail-Seite zu deinem Portfolio hinzu.",
+    addToPortfolio: "+ Portfolio",
+    quantity: "Anzahl",
+    totalItems: "Gesamt Stück",
+    estimatedValue: "Geschätzter Wert",
+    remove: "Entfernen",
   },
 };
 
@@ -198,6 +244,8 @@ const en: Translations = {
     dashboard: "Dashboard",
     catalog: "Catalog",
     compare: "Compare",
+    favorites: "Favorites",
+    portfolio: "Portfolio",
   },
   dashboard: {
     title: "HabboMarket",
@@ -294,6 +342,27 @@ const en: Translations = {
   },
   common: {
     searchFurni: "Search furni...",
+    recentSearches: "Recent Searches",
+    clearHistory: "Clear History",
+  },
+  favorites: {
+    title: "Favorites",
+    subtitle: "Your saved favorite furni",
+    empty: "No favorites yet",
+    emptyHint: "Click the heart icon on any furni to save it here.",
+    addFavorite: "Add to favorites",
+    removeFavorite: "Remove from favorites",
+  },
+  portfolio: {
+    title: "Portfolio",
+    subtitle: "Track your furni and estimated total value",
+    empty: "Portfolio is empty",
+    emptyHint: "Add furni from the catalog or detail page to track your collection.",
+    addToPortfolio: "+ Portfolio",
+    quantity: "Qty",
+    totalItems: "Total Items",
+    estimatedValue: "Est. Value",
+    remove: "Remove",
   },
 };
 

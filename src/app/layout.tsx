@@ -3,6 +3,8 @@ import { Press_Start_2P, Inter, JetBrains_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { CompareProvider } from "@/components/providers/CompareProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { FavoritesProvider } from "@/components/providers/FavoritesProvider";
+import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
 import "./globals.css";
 
 const pixelFont = Press_Start_2P({
@@ -39,10 +41,14 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-[family-name:var(--font-body)]">
         <LanguageProvider>
-          <CompareProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-          </CompareProvider>
+          <FavoritesProvider>
+            <PortfolioProvider>
+              <CompareProvider>
+                <Header />
+                <main className="flex-1">{children}</main>
+              </CompareProvider>
+            </PortfolioProvider>
+          </FavoritesProvider>
         </LanguageProvider>
       </body>
     </html>

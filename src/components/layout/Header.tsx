@@ -3,18 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCompare } from "@/components/providers/CompareProvider";
+import { useFavorites } from "@/components/providers/FavoritesProvider";
+import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { LanguageSelector } from "@/components/common/LanguageSelector";
 
 export function Header() {
   const pathname = usePathname();
   const { items } = useCompare();
+  const { favorites } = useFavorites();
+  const { totalItems } = usePortfolio();
   const { t } = useLanguage();
 
   const navLinks = [
-    { href: "/", label: t.nav.dashboard },
-    { href: "/catalog", label: t.nav.catalog },
-    { href: "/compare", label: t.nav.compare },
+    { href: "/", label: t.nav.dashboard, badge: 0 },
+    { href: "/catalog", label: t.nav.catalog, badge: 0 },
+    { href: "/compare", label: t.nav.compare, badge: items.length },
+    { href: "/favorites", label: t.nav.favorites, badge: favorites.length },
+    { href: "/portfolio", label: t.nav.portfolio, badge: totalItems },
   ];
 
   return (
@@ -52,9 +58,9 @@ export function Header() {
                   `}
                 >
                   {link.label}
-                  {link.href === "/compare" && items.length > 0 && (
+                  {link.badge > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-habbo-gold text-habbo-bg text-[9px] font-bold rounded-full flex items-center justify-center">
-                      {items.length}
+                      {link.badge}
                     </span>
                   )}
                 </Link>
