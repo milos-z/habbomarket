@@ -5,7 +5,7 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits, calculatePriceChange } from "@/lib/utils";
+import { formatCredits, calculatePriceChange, exportToCSV } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
@@ -16,6 +16,8 @@ import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { FurniItem } from "@/lib/types";
+
+type DayRange = "7" | "30" | "90" | "180" | "365" | "all";
 
 const PALETTE = [
   CHART_COLORS.primary,
@@ -39,6 +41,7 @@ export default function ComparePage() {
     addItem({ classname: item.classname, name: item.name });
   }, [addItem]);
   const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [days, setDays] = useState<DayRange>("90");
   const [entries, setEntries] = useState<MarketEntry[]>([]);
 
   const loadAllData = useCallback(async () => {
@@ -56,8 +59,9 @@ export default function ComparePage() {
       }))
     );
 
+    const daysNum = days === "all" ? undefined : parseInt(days);
     const results = await Promise.allSettled(
-      items.map((item) => fetchMarketHistory(item.classname, hotel, 90))
+      items.map((item) => fetchMarketHistory(item.classname, hotel, daysNum))
     );
 
     setEntries(
@@ -70,7 +74,7 @@ export default function ComparePage() {
         return { classname: item.classname, name: item.name, data, loading: false };
       })
     );
-  }, [items, hotel]);
+  }, [items, hotel, days]);
 
   useEffect(() => {
     loadAllData();
@@ -103,8 +107,27 @@ export default function ComparePage() {
             {t.compare.subtitle}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <HotelSelector value={hotel} onChange={setHotel} />
+          <div className="flex gap-1 flex-wrap">
+            {(["7", "30", "90", "180", "365", "all"] as DayRange[]).map((d) => {
+              let label: string;
+              if (d === "all") label = t.furniDetail.allTime;
+              else if (d === "180") label = t.furniDetail.sixMonths;
+              else if (d === "365") label = t.furniDetail.oneYear;
+              else label = `${d}d`;
+              return (
+                <PixelButton
+                  key={d}
+                  variant={days === d ? "primary" : "ghost"}
+                  size="sm"
+                  onClick={() => setDays(d)}
+                >
+                  {label}
+                </PixelButton>
+              );
+            })}
+          </div>
           {items.length > 0 && (
             <PixelButton variant="ghost" size="sm" onClick={clearItems}>
               {t.compare.clearAll}
@@ -186,9 +209,48 @@ export default function ComparePage() {
 
       {entries.some((e) => e.data) && (
         <PixelCard className="p-4 overflow-x-auto">
-          <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
-            {t.compare.metricsComparison}
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider">
+              {t.compare.metricsComparison}
+            </h2>
+            <PixelButton
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const headers = [
+                  t.compare.item,
+                  t.furniDetail.avgPrice,
+                  t.furniDetail.change,
+                  t.furniDetail.volume,
+                  t.furniDetail.offers,
+                  t.furniDetail.high,
+                  t.furniDetail.low,
+                ];
+                const rows = entries
+                  .filter((e) => e.data)
+                  .map((e) => {
+                    const h = e.data!.marketData.history;
+                    const change = calculatePriceChange(h);
+                    const vol = h.reduce((s, x) => s + x.soldItems, 0);
+                    const off = h.length > 0 ? h[h.length - 1].openOffers : 0;
+                    const hi = Math.max(...h.map((x) => x.avgPrice));
+                    const lo = Math.min(...h.map((x) => x.avgPrice));
+                    return [
+                      e.name,
+                      e.data!.marketData.averagePrice,
+                      change ? change.percentage.toFixed(1) : "N/A",
+                      vol,
+                      off,
+                      hi,
+                      lo,
+                    ];
+                  });
+                exportToCSV(`compare-${hotel}-${days}`, headers, rows);
+              }}
+            >
+              {t.furniDetail.exportCSV}
+            </PixelButton>
+          </div>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-habbo-border">
