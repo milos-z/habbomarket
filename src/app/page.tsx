@@ -6,6 +6,7 @@ import { SpotlightCarousel } from "@/components/dashboard/SpotlightCarousel";
 import { QuickStats } from "@/components/dashboard/QuickStats";
 import { PriceMovers } from "@/components/dashboard/PriceMovers";
 import { TrendingFurni } from "@/components/dashboard/TrendingFurni";
+import { MarketSummary } from "@/components/dashboard/MarketSummary";
 import { PixelButton } from "@/components/common/PixelButton";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -36,6 +37,7 @@ export default function DashboardPage() {
       </section>
 
       <QuickStats />
+      <MarketSummary />
       <SpotlightCarousel />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
