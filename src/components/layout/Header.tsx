@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useFavorites } from "@/components/providers/FavoritesProvider";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { useAlerts } from "@/components/providers/AlertsProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { LanguageSelector } from "@/components/common/LanguageSelector";
 
@@ -13,14 +14,18 @@ export function Header() {
   const { items } = useCompare();
   const { favorites } = useFavorites();
   const { totalItems } = usePortfolio();
+  const { triggeredCount } = useAlerts();
   const { t } = useLanguage();
 
   const navLinks = [
     { href: "/", label: t.nav.dashboard, badge: 0 },
     { href: "/catalog", label: t.nav.catalog, badge: 0 },
+    { href: "/trade", label: t.nav.trade, badge: 0 },
+    { href: "/arbitrage", label: t.nav.arbitrage, badge: 0 },
     { href: "/compare", label: t.nav.compare, badge: items.length },
     { href: "/favorites", label: t.nav.favorites, badge: favorites.length },
     { href: "/portfolio", label: t.nav.portfolio, badge: totalItems },
+    { href: "/alerts", label: t.nav.alerts, badge: triggeredCount },
   ];
 
   return (

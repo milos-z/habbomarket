@@ -5,6 +5,8 @@ import { CompareProvider } from "@/components/providers/CompareProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { FavoritesProvider } from "@/components/providers/FavoritesProvider";
 import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
+import { AlertsProvider } from "@/components/providers/AlertsProvider";
+import { ToastContainer } from "@/components/common/Toast";
 import "./globals.css";
 
 const pixelFont = Press_Start_2P({
@@ -44,8 +46,11 @@ export default function RootLayout({
           <FavoritesProvider>
             <PortfolioProvider>
               <CompareProvider>
-                <Header />
-                <main className="flex-1">{children}</main>
+                <AlertsProvider>
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <ToastContainer />
+                </AlertsProvider>
               </CompareProvider>
             </PortfolioProvider>
           </FavoritesProvider>
