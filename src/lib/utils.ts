@@ -53,3 +53,27 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+export function exportToCSV(
+  filename: string,
+  headers: string[],
+  rows: (string | number)[][]
+): void {
+  const escape = (val: string | number) => {
+    const str = String(val);
+    return str.includes(",") || str.includes('"')
+      ? `"${str.replace(/"/g, '""')}"`
+      : str;
+  };
+  const csv = [
+    headers.map(escape).join(","),
+    ...rows.map((row) => row.map(escape).join(",")),
+  ].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
