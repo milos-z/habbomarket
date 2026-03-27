@@ -12,6 +12,9 @@ export interface Translations {
     compare: string;
     favorites: string;
     portfolio: string;
+    trade: string;
+    arbitrage: string;
+    alerts: string;
   };
   dashboard: {
     title: string;
@@ -122,6 +125,65 @@ export interface Translations {
     profitLoss: string;
     totalProfit: string;
   };
+  trade: {
+    title: string;
+    subtitle: string;
+    iGive: string;
+    iReceive: string;
+    searchToAdd: string;
+    totalValue: string;
+    fairTrade: string;
+    slightEdge: string;
+    unfairTrade: string;
+    difference: string;
+    swapSides: string;
+    clearTrade: string;
+    empty: string;
+    emptyHint: string;
+    addItems: string;
+    perItem: string;
+  };
+  arbitrage: {
+    title: string;
+    subtitle: string;
+    selectCategory: string;
+    scan: string;
+    scanning: string;
+    stopScan: string;
+    scanned: string;
+    opportunities: string;
+    noResults: string;
+    noResultsHint: string;
+    comPrice: string;
+    dePrice: string;
+    diff: string;
+    direction: string;
+    buyOnCom: string;
+    buyOnDe: string;
+    minVolume: string;
+    minDifference: string;
+  };
+  alerts: {
+    title: string;
+    subtitle: string;
+    createAlert: string;
+    targetPrice: string;
+    direction: string;
+    above: string;
+    below: string;
+    active: string;
+    triggered: string;
+    snoozed: string;
+    snooze: string;
+    deleteAlert: string;
+    reactivate: string;
+    empty: string;
+    emptyHint: string;
+    currentPrice: string;
+    created: string;
+    triggeredAt: string;
+    checking: string;
+  };
 }
 
 const de: Translations = {
@@ -131,6 +193,9 @@ const de: Translations = {
     compare: "Vergleichen",
     favorites: "Favoriten",
     portfolio: "Portfolio",
+    trade: "Trade",
+    arbitrage: "Arbitrage",
+    alerts: "Alarme",
   },
   dashboard: {
     title: "HabboMarket",
@@ -261,6 +326,65 @@ const de: Translations = {
     profitLoss: "Gewinn/Verlust",
     totalProfit: "Gesamt G/V",
   },
+  trade: {
+    title: "Trade Rechner",
+    subtitle: "Berechne ob ein Trade fair ist, bevor du tauschst",
+    iGive: "Ich gebe",
+    iReceive: "Ich bekomme",
+    searchToAdd: "Möbel suchen & hinzufügen...",
+    totalValue: "Gesamtwert",
+    fairTrade: "Fairer Trade",
+    slightEdge: "Leichter Vorteil",
+    unfairTrade: "Unfairer Trade",
+    difference: "Differenz",
+    swapSides: "Seiten tauschen",
+    clearTrade: "Trade leeren",
+    empty: "Kein Trade eingerichtet",
+    emptyHint: "Füge Möbel auf beiden Seiten hinzu, um den Trade-Wert zu berechnen.",
+    addItems: "Artikel hinzufügen",
+    perItem: "pro Stück",
+  },
+  arbitrage: {
+    title: "Arbitrage Finder",
+    subtitle: "Finde Preisunterschiede zwischen .COM und .DE Hotels",
+    selectCategory: "Kategorie wählen",
+    scan: "Scannen",
+    scanning: "Scanne...",
+    stopScan: "Scan stoppen",
+    scanned: "gescannt",
+    opportunities: "Möglichkeiten",
+    noResults: "Keine Ergebnisse",
+    noResultsHint: "Wähle eine Kategorie und starte den Scan, um Preisunterschiede zu finden.",
+    comPrice: ".COM Preis",
+    dePrice: ".DE Preis",
+    diff: "Diff",
+    direction: "Richtung",
+    buyOnCom: "Kauf auf .COM",
+    buyOnDe: "Kauf auf .DE",
+    minVolume: "Min. Volumen",
+    minDifference: "Min. Differenz %",
+  },
+  alerts: {
+    title: "Preis-Alarme",
+    subtitle: "Überwache Preise und werde benachrichtigt wenn Schwellen erreicht werden",
+    createAlert: "Alarm erstellen",
+    targetPrice: "Zielpreis",
+    direction: "Richtung",
+    above: "Über",
+    below: "Unter",
+    active: "Aktiv",
+    triggered: "Ausgelöst",
+    snoozed: "Pausiert",
+    snooze: "Pausieren",
+    deleteAlert: "Löschen",
+    reactivate: "Reaktivieren",
+    empty: "Keine Alarme",
+    emptyHint: "Erstelle einen Alarm, um benachrichtigt zu werden wenn ein Preis dein Ziel erreicht.",
+    currentPrice: "Aktueller Preis",
+    created: "Erstellt",
+    triggeredAt: "Ausgelöst am",
+    checking: "Prüfe...",
+  },
 };
 
 const en: Translations = {
@@ -270,6 +394,9 @@ const en: Translations = {
     compare: "Compare",
     favorites: "Favorites",
     portfolio: "Portfolio",
+    trade: "Trade",
+    arbitrage: "Arbitrage",
+    alerts: "Alerts",
   },
   dashboard: {
     title: "HabboMarket",
@@ -399,6 +526,65 @@ const en: Translations = {
     buyPrice: "Buy Price",
     profitLoss: "Profit/Loss",
     totalProfit: "Total P/L",
+  },
+  trade: {
+    title: "Trade Calculator",
+    subtitle: "Calculate if a trade is fair before you swap",
+    iGive: "I Give",
+    iReceive: "I Receive",
+    searchToAdd: "Search furni to add...",
+    totalValue: "Total Value",
+    fairTrade: "Fair Trade",
+    slightEdge: "Slight Edge",
+    unfairTrade: "Unfair Trade",
+    difference: "Difference",
+    swapSides: "Swap Sides",
+    clearTrade: "Clear Trade",
+    empty: "No trade set up",
+    emptyHint: "Add furni to both sides to calculate trade value.",
+    addItems: "Add items",
+    perItem: "per item",
+  },
+  arbitrage: {
+    title: "Arbitrage Finder",
+    subtitle: "Find price gaps between .COM and .DE hotels",
+    selectCategory: "Select Category",
+    scan: "Scan",
+    scanning: "Scanning...",
+    stopScan: "Stop Scan",
+    scanned: "scanned",
+    opportunities: "opportunities",
+    noResults: "No results",
+    noResultsHint: "Select a category and start scanning to find price differences.",
+    comPrice: ".COM Price",
+    dePrice: ".DE Price",
+    diff: "Diff",
+    direction: "Direction",
+    buyOnCom: "Buy on .COM",
+    buyOnDe: "Buy on .DE",
+    minVolume: "Min Volume",
+    minDifference: "Min Difference %",
+  },
+  alerts: {
+    title: "Price Alerts",
+    subtitle: "Monitor prices and get notified when thresholds are hit",
+    createAlert: "Create Alert",
+    targetPrice: "Target Price",
+    direction: "Direction",
+    above: "Above",
+    below: "Below",
+    active: "Active",
+    triggered: "Triggered",
+    snoozed: "Snoozed",
+    snooze: "Snooze",
+    deleteAlert: "Delete",
+    reactivate: "Reactivate",
+    empty: "No alerts",
+    emptyHint: "Create an alert to get notified when a price hits your target.",
+    currentPrice: "Current Price",
+    created: "Created",
+    triggeredAt: "Triggered at",
+    checking: "Checking...",
   },
 };
 

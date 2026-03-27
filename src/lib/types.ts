@@ -106,3 +106,64 @@ export interface HotelConfig {
   baseUrl: string;
   flag: string;
 }
+
+// --- Trade Calculator ---
+
+export interface TradeItem {
+  classname: string;
+  name: string;
+  quantity: number;
+  avgPrice: number;
+  loading: boolean;
+}
+
+export enum TradeFairness {
+  FAIR = "fair",
+  SLIGHT_EDGE = "edge",
+  UNFAIR = "unfair",
+}
+
+// --- Arbitrage Finder ---
+
+export interface ArbitrageResult {
+  classname: string;
+  name: string;
+  comPrice: number;
+  dePrice: number;
+  comVolume: number;
+  deVolume: number;
+  difference: number;
+  differencePercent: number;
+  direction: ArbitrageDirection;
+}
+
+export enum ArbitrageDirection {
+  BUY_COM_SELL_DE = "buyComSellDe",
+  BUY_DE_SELL_COM = "buyDeSellCom",
+}
+
+// --- Price Alerts ---
+
+export interface PriceAlert {
+  id: string;
+  classname: string;
+  name: string;
+  targetPrice: number;
+  direction: AlertDirection;
+  hotel: HotelDomain;
+  status: AlertStatus;
+  currentPrice: number;
+  createdAt: number;
+  triggeredAt?: number;
+}
+
+export enum AlertDirection {
+  ABOVE = "above",
+  BELOW = "below",
+}
+
+export enum AlertStatus {
+  ACTIVE = "active",
+  TRIGGERED = "triggered",
+  SNOOZED = "snoozed",
+}
