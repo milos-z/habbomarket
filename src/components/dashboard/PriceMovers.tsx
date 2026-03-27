@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { furniImageUrl, formatCredits } from "@/lib/utils";
+import { formatCredits } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { FurniImage } from "@/components/common/FurniImage";
 
 interface MoverItem {
   classname: string;
@@ -97,11 +98,11 @@ export function PriceMovers() {
               href={`/furni/${encodeURIComponent(item.classname)}`}
               className="flex items-center gap-3 px-2 py-1.5 rounded hover:bg-habbo-card-hover transition-colors group"
             >
-              <img
-                src={furniImageUrl(item.classname)}
+              <FurniImage
+                classname={item.classname}
                 alt={item.name}
-                className="w-7 h-7 object-contain group-hover:scale-110 transition-transform"
-                loading="lazy"
+                size="sm"
+                className="group-hover:scale-110 transition-transform"
               />
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-habbo-text truncate">

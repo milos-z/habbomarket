@@ -5,15 +5,18 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { furniImageUrl, formatCredits, calculatePriceChange } from "@/lib/utils";
+import { formatCredits, calculatePriceChange } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
 import { HotelSelector } from "@/components/common/HotelSelector";
+import { FurniImage } from "@/components/common/FurniImage";
 import { PriceChart } from "@/components/charts/PriceChart";
 import { VolumeChart } from "@/components/charts/VolumeChart";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
+import { useFavorites } from "@/components/providers/FavoritesProvider";
+import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 type DayRange = "7" | "30" | "90" | "all";
@@ -36,7 +39,10 @@ export default function FurniDetailPage({
   const [error, setError] = useState<string | null>(null);
 
   const { addItem, removeItem, hasItem } = useCompare();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { addEntry: addToPortfolio } = usePortfolio();
   const inCompare = hasItem(decoded);
+  const faved = isFavorite(decoded);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -103,12 +109,21 @@ export default function FurniDetailPage({
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="lg:w-72 shrink-0">
           <PixelCard className="p-5 text-center" gold>
-            <div className="w-full h-32 flex items-center justify-center mb-4">
-              <img
-                src={furniImageUrl(decoded)}
+            <div className="relative w-full h-32 flex items-center justify-center mb-4">
+              <FurniImage
+                classname={decoded}
                 alt={data?.furniName ?? decoded}
-                className="max-h-full max-w-full object-contain drop-shadow-xl"
+                size="lg"
+                className="drop-shadow-xl"
               />
+              <button
+                onClick={() => toggleFavorite(decoded)}
+                className={`absolute top-0 right-0 w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all ${
+                  faved ? "text-red-400 scale-110" : "text-habbo-text-dim/40 hover:text-red-400"
+                }`}
+              >
+                {faved ? "♥" : "♡"}
+              </button>
             </div>
             <h1 className="font-[family-name:var(--font-pixel)] text-sm text-habbo-gold pixel-text-shadow mb-1">
               {data?.furniName ?? decoded}
@@ -130,7 +145,7 @@ export default function FurniDetailPage({
                 <span className="text-habbo-text">{data?.furniType ?? "—"}</span>
               </div>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-col gap-2">
               <PixelButton
                 variant={inCompare ? "primary" : "gold"}
                 size="sm"
@@ -147,6 +162,14 @@ export default function FurniDetailPage({
                 }}
               >
                 {inCompare ? t.furniDetail.inCompare : t.furniDetail.addToCompare}
+              </PixelButton>
+              <PixelButton
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={() => addToPortfolio(decoded, data?.furniName ?? decoded)}
+              >
+                {t.portfolio.addToPortfolio}
               </PixelButton>
             </div>
           </PixelCard>

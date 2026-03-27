@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
-import { furniImageUrl } from "@/lib/utils";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { FurniImage } from "@/components/common/FurniImage";
 
 const SPOTLIGHT_ITEMS = [
   "throne",
@@ -78,10 +78,11 @@ export function SpotlightCarousel() {
           href={`/furni/${encodeURIComponent(current.classname)}`}
           className="shrink-0 w-24 h-24 flex items-center justify-center group"
         >
-          <img
-            src={furniImageUrl(current.classname)}
+          <FurniImage
+            classname={current.classname}
             alt={current.name}
-            className="max-h-full max-w-full object-contain drop-shadow-xl group-hover:scale-110 transition-transform"
+            size="lg"
+            className="drop-shadow-xl group-hover:scale-110 transition-transform"
           />
         </Link>
 

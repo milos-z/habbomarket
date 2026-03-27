@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
-import { furniImageUrl } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { FurniImage } from "@/components/common/FurniImage";
 
 const POPULAR_CLASSNAMES = [
   "throne",
@@ -69,11 +69,11 @@ export function TrendingFurni() {
               <span className="text-[10px] font-mono text-habbo-text-dim w-4 text-right">
                 {idx + 1}
               </span>
-              <img
-                src={furniImageUrl(item.classname)}
+              <FurniImage
+                classname={item.classname}
                 alt={item.name}
-                className="w-7 h-7 object-contain group-hover:scale-110 transition-transform"
-                loading="lazy"
+                size="sm"
+                className="group-hover:scale-110 transition-transform"
               />
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-habbo-text truncate">

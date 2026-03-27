@@ -5,12 +5,13 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { furniImageUrl, formatCredits, calculatePriceChange } from "@/lib/utils";
+import { formatCredits, calculatePriceChange } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
 import { HotelSelector } from "@/components/common/HotelSelector";
 import { SearchBar } from "@/components/common/SearchBar";
+import { FurniImage } from "@/components/common/FurniImage";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -142,11 +143,7 @@ export default function ComparePage() {
                 className="w-3 h-3 rounded-full shrink-0"
                 style={{ backgroundColor: PALETTE[idx % PALETTE.length] }}
               />
-              <img
-                src={furniImageUrl(entry.classname)}
-                alt={entry.name}
-                className="w-8 h-8 object-contain"
-              />
+              <FurniImage classname={entry.classname} alt={entry.name} size="md" />
               <div className="min-w-0">
                 <Link
                   href={`/furni/${encodeURIComponent(entry.classname)}`}
@@ -245,11 +242,7 @@ export default function ComparePage() {
                               backgroundColor: PALETTE[idx % PALETTE.length],
                             }}
                           />
-                          <img
-                            src={furniImageUrl(entry.classname)}
-                            alt={entry.name}
-                            className="w-6 h-6 object-contain"
-                          />
+                          <FurniImage classname={entry.classname} alt={entry.name} size="sm" />
                           <span className="text-xs text-habbo-text truncate">
                             {entry.name}
                           </span>
