@@ -4,9 +4,11 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits } from "@/lib/utils";
+import { formatCredits, exportToCSV } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
+import { PixelButton } from "@/components/common/PixelButton";
 import { FurniImage } from "@/components/common/FurniImage";
+import { HotelSelector } from "@/components/common/HotelSelector";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -16,8 +18,10 @@ interface PriceInfo {
 }
 
 export default function PortfolioPage() {
-  const { entries, removeEntry, updateQuantity, totalItems } = usePortfolio();
+  const { entries, removeEntry, updateQuantity, updateBuyPrice, totalItems } =
+    usePortfolio();
   const { t } = useLanguage();
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
   const [prices, setPrices] = useState<Record<string, PriceInfo>>({});
 
   useEffect(() => {
@@ -32,11 +36,7 @@ export default function PortfolioPage() {
     async function loadPrices() {
       const results = await Promise.allSettled(
         entries.map(async (entry) => {
-          const data = await fetchMarketHistory(
-            entry.classname,
-            HotelDomain.COM,
-            30
-          );
+          const data = await fetchMarketHistory(entry.classname, hotel, 30);
           const avg =
             data.length > 0 ? data[0].marketData.averagePrice : 0;
           return { classname: entry.classname, avgPrice: avg };
@@ -56,7 +56,7 @@ export default function PortfolioPage() {
     }
 
     loadPrices();
-  }, [entries]);
+  }, [entries, hotel]);
 
   const totalValue = useMemo(() => {
     return entries.reduce((sum, e) => {
@@ -64,6 +64,34 @@ export default function PortfolioPage() {
       return sum + price * e.quantity;
     }, 0);
   }, [entries, prices]);
+
+  const totalProfit = useMemo(() => {
+    return entries.reduce((sum, e) => {
+      if (!e.buyPrice) return sum;
+      const current = prices[e.classname]?.avgPrice ?? 0;
+      return sum + (current - e.buyPrice) * e.quantity;
+    }, 0);
+  }, [entries, prices]);
+
+  const hasBuyPrices = entries.some((e) => e.buyPrice && e.buyPrice > 0);
+
+  function handleExportCSV() {
+    const headers = [
+      t.compare.item,
+      t.portfolio.quantity,
+      t.portfolio.buyPrice,
+      t.furniDetail.avgPrice,
+      t.portfolio.estimatedValue,
+      t.portfolio.profitLoss,
+    ];
+    const rows = entries.map((e) => {
+      const avg = prices[e.classname]?.avgPrice ?? 0;
+      const value = avg * e.quantity;
+      const pl = e.buyPrice ? (avg - e.buyPrice) * e.quantity : 0;
+      return [e.name, e.quantity, e.buyPrice ?? 0, avg, value, pl];
+    });
+    exportToCSV(`portfolio-${hotel}`, headers, rows);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -76,27 +104,51 @@ export default function PortfolioPage() {
             {t.portfolio.subtitle}
           </p>
         </div>
-        {entries.length > 0 && (
-          <div className="flex gap-4">
-            <PixelCard className="px-4 py-2 text-center">
-              <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                {t.portfolio.totalItems}
-              </div>
-              <div className="text-sm font-mono font-bold text-habbo-cyan mt-0.5">
-                {totalItems}
-              </div>
-            </PixelCard>
-            <PixelCard className="px-4 py-2 text-center">
-              <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
-                {t.portfolio.estimatedValue}
-              </div>
-              <div className="text-sm font-mono font-bold text-habbo-gold mt-0.5">
-                {formatCredits(totalValue)}c
-              </div>
-            </PixelCard>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <HotelSelector value={hotel} onChange={setHotel} />
+          {entries.length > 0 && (
+            <PixelButton variant="ghost" size="sm" onClick={handleExportCSV}>
+              {t.furniDetail.exportCSV}
+            </PixelButton>
+          )}
+        </div>
       </div>
+
+      {entries.length > 0 && (
+        <div className="flex flex-wrap gap-3">
+          <PixelCard className="px-4 py-2 text-center">
+            <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
+              {t.portfolio.totalItems}
+            </div>
+            <div className="text-sm font-mono font-bold text-habbo-cyan mt-0.5">
+              {totalItems}
+            </div>
+          </PixelCard>
+          <PixelCard className="px-4 py-2 text-center">
+            <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
+              {t.portfolio.estimatedValue}
+            </div>
+            <div className="text-sm font-mono font-bold text-habbo-gold mt-0.5">
+              {formatCredits(totalValue)}c
+            </div>
+          </PixelCard>
+          {hasBuyPrices && (
+            <PixelCard className="px-4 py-2 text-center">
+              <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
+                {t.portfolio.totalProfit}
+              </div>
+              <div
+                className={`text-sm font-mono font-bold mt-0.5 ${
+                  totalProfit >= 0 ? "text-habbo-green" : "text-habbo-red"
+                }`}
+              >
+                {totalProfit >= 0 ? "+" : ""}
+                {formatCredits(totalProfit)}c
+              </div>
+            </PixelCard>
+          )}
+        </div>
+      )}
 
       {entries.length === 0 ? (
         <PixelCard className="p-8 text-center">
@@ -122,8 +174,11 @@ export default function PortfolioPage() {
                 <th className="text-left py-2 text-xs text-habbo-text-dim font-normal">
                   {t.compare.item}
                 </th>
-                <th className="text-center py-2 text-xs text-habbo-text-dim font-normal w-32">
+                <th className="text-center py-2 text-xs text-habbo-text-dim font-normal w-28">
                   {t.portfolio.quantity}
+                </th>
+                <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
+                  {t.portfolio.buyPrice}
                 </th>
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
                   {t.furniDetail.avgPrice}
@@ -131,13 +186,20 @@ export default function PortfolioPage() {
                 <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
                   {t.portfolio.estimatedValue}
                 </th>
-                <th className="w-10" />
+                <th className="text-right py-2 text-xs text-habbo-text-dim font-normal">
+                  {t.portfolio.profitLoss}
+                </th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody>
               {entries.map((entry) => {
                 const price = prices[entry.classname];
-                const itemValue = (price?.avgPrice ?? 0) * entry.quantity;
+                const avg = price?.avgPrice ?? 0;
+                const itemValue = avg * entry.quantity;
+                const pl = entry.buyPrice
+                  ? (avg - entry.buyPrice) * entry.quantity
+                  : null;
 
                 return (
                   <tr
@@ -160,7 +222,7 @@ export default function PortfolioPage() {
                       </Link>
                     </td>
                     <td className="py-3">
-                      <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() =>
                             updateQuantity(entry.classname, entry.quantity - 1)
@@ -176,7 +238,7 @@ export default function PortfolioPage() {
                             const val = parseInt(e.target.value) || 0;
                             if (val > 0) updateQuantity(entry.classname, val);
                           }}
-                          className="w-14 text-center bg-habbo-input border border-habbo-border rounded text-xs text-habbo-text py-1 focus:outline-none focus:border-habbo-cyan/50"
+                          className="w-12 text-center bg-habbo-input border border-habbo-border rounded text-xs text-habbo-text py-1 focus:outline-none focus:border-habbo-cyan/50"
                           min={1}
                         />
                         <button
@@ -189,15 +251,43 @@ export default function PortfolioPage() {
                         </button>
                       </div>
                     </td>
+                    <td className="py-3">
+                      <input
+                        type="number"
+                        value={entry.buyPrice ?? ""}
+                        placeholder="—"
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          updateBuyPrice(entry.classname, val > 0 ? val : undefined);
+                        }}
+                        className="w-20 text-right bg-habbo-input border border-habbo-border rounded text-xs text-habbo-text py-1 px-2 focus:outline-none focus:border-habbo-cyan/50 ml-auto block"
+                        min={0}
+                      />
+                    </td>
                     <td className="text-right font-mono text-xs text-habbo-cyan py-3">
                       {price?.loading ? (
                         <span className="inline-block w-4 h-4 border-2 border-habbo-cyan/20 border-t-habbo-cyan rounded-full animate-spin" />
                       ) : (
-                        `${formatCredits(price?.avgPrice ?? 0)}c`
+                        `${formatCredits(avg)}c`
                       )}
                     </td>
                     <td className="text-right font-mono text-xs text-habbo-gold py-3">
                       {price?.loading ? "..." : `${formatCredits(itemValue)}c`}
+                    </td>
+                    <td
+                      className={`text-right font-mono text-xs py-3 ${
+                        pl === null
+                          ? "text-habbo-text-dim"
+                          : pl >= 0
+                            ? "text-habbo-green"
+                            : "text-habbo-red"
+                      }`}
+                    >
+                      {price?.loading
+                        ? "..."
+                        : pl === null
+                          ? "—"
+                          : `${pl >= 0 ? "+" : ""}${formatCredits(pl)}c`}
                     </td>
                     <td className="text-center py-3">
                       <button

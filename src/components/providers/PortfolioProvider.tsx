@@ -15,6 +15,7 @@ export interface PortfolioEntry {
   classname: string;
   name: string;
   quantity: number;
+  buyPrice?: number;
 }
 
 interface PortfolioContextValue {
@@ -22,6 +23,7 @@ interface PortfolioContextValue {
   addEntry: (classname: string, name: string, quantity?: number) => void;
   removeEntry: (classname: string) => void;
   updateQuantity: (classname: string, quantity: number) => void;
+  updateBuyPrice: (classname: string, buyPrice: number | undefined) => void;
   getEntry: (classname: string) => PortfolioEntry | undefined;
   totalItems: number;
 }
@@ -92,6 +94,16 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const updateBuyPrice = useCallback((classname: string, buyPrice: number | undefined) => {
+    setEntries((prev) => {
+      const next = prev.map((e) =>
+        e.classname === classname ? { ...e, buyPrice } : e
+      );
+      saveToStorage(next);
+      return next;
+    });
+  }, []);
+
   const getEntry = useCallback(
     (classname: string) => entries.find((e) => e.classname === classname),
     [entries]
@@ -101,7 +113,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
 
   return (
     <PortfolioContext
-      value={{ entries, addEntry, removeEntry, updateQuantity, getEntry, totalItems }}
+      value={{ entries, addEntry, removeEntry, updateQuantity, updateBuyPrice, getEntry, totalItems }}
     >
       {children}
     </PortfolioContext>
