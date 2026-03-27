@@ -5,7 +5,7 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits, calculatePriceChange } from "@/lib/utils";
+import { formatCredits, calculatePriceChange, exportToCSV } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
@@ -19,7 +19,7 @@ import { useFavorites } from "@/components/providers/FavoritesProvider";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
-type DayRange = "7" | "30" | "90" | "all";
+type DayRange = "7" | "30" | "90" | "180" | "365" | "all";
 
 export default function FurniDetailPage({
   params,
@@ -239,19 +239,48 @@ export default function FurniDetailPage({
         <div className="flex-1 min-w-0 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <HotelSelector value={hotel} onChange={setHotel} />
-            <div className="flex gap-1">
-              {(["7", "30", "90", "all"] as DayRange[]).map((d) => (
-                <PixelButton
-                  key={d}
-                  variant={days === d ? "primary" : "ghost"}
-                  size="sm"
-                  onClick={() => setDays(d)}
-                >
-                  {d === "all" ? t.furniDetail.allTime : `${d}d`}
-                </PixelButton>
-              ))}
+            <div className="flex gap-1 flex-wrap">
+              {(["7", "30", "90", "180", "365", "all"] as DayRange[]).map((d) => {
+                let label: string;
+                if (d === "all") label = t.furniDetail.allTime;
+                else if (d === "180") label = t.furniDetail.sixMonths;
+                else if (d === "365") label = t.furniDetail.oneYear;
+                else label = `${d}d`;
+                return (
+                  <PixelButton
+                    key={d}
+                    variant={days === d ? "primary" : "ghost"}
+                    size="sm"
+                    onClick={() => setDays(d)}
+                  >
+                    {label}
+                  </PixelButton>
+                );
+              })}
             </div>
           </div>
+
+          {!loading && !error && history.length > 0 && (
+            <div className="flex justify-end">
+              <PixelButton
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const headers = ["Date", "Avg Price", "Sold Items", "Credit Sum", "Open Offers"];
+                  const rows = history.map((h) => [
+                    new Date(h.timestamp * 1000).toISOString().split("T")[0],
+                    h.avgPrice,
+                    h.soldItems,
+                    h.creditSum,
+                    h.openOffers,
+                  ]);
+                  exportToCSV(`${decoded}-${hotel}-${days}d`, headers, rows);
+                }}
+              >
+                {t.furniDetail.exportCSV}
+              </PixelButton>
+            </div>
+          )}
 
           {loading ? (
             <PixelCard className="p-6 h-[340px] flex items-center justify-center">
