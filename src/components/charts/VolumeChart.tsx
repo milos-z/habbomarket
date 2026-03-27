@@ -11,9 +11,10 @@ import { ensureChartRegistered } from "./ChartSetup";
 interface VolumeChartProps {
   history: HistoryEntry[];
   height?: number;
+  label?: string;
 }
 
-export function VolumeChart({ history, height = 200 }: VolumeChartProps) {
+export function VolumeChart({ history, height = 200, label = "Items Sold" }: VolumeChartProps) {
   ensureChartRegistered();
 
   const data = useMemo(
@@ -21,7 +22,7 @@ export function VolumeChart({ history, height = 200 }: VolumeChartProps) {
       labels: history.map((h) => formatDate(h.timestamp)),
       datasets: [
         {
-          label: "Items Sold",
+          label,
           data: history.map((h) => h.soldItems),
           backgroundColor: `${CHART_COLORS.secondary}60`,
           borderColor: CHART_COLORS.secondary,

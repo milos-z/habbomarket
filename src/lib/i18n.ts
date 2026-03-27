@@ -36,6 +36,7 @@ export interface Translations {
     marketStable: string;
     avgChange: string;
     itemsTracked: string;
+    traderTools: string;
   };
   catalog: {
     title: string;
@@ -218,6 +219,7 @@ const de: Translations = {
     marketStable: "Markt stabil",
     avgChange: "Ø Änderung",
     itemsTracked: "Artikel beobachtet",
+    traderTools: "Trader-Werkzeuge",
   },
   catalog: {
     title: "Möbel-Katalog",
@@ -419,6 +421,7 @@ const en: Translations = {
     marketStable: "Market stable",
     avgChange: "Avg Change",
     itemsTracked: "Items tracked",
+    traderTools: "Trader Tools",
   },
   catalog: {
     title: "Furni Catalog",

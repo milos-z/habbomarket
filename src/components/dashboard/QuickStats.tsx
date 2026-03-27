@@ -8,6 +8,7 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export function QuickStats() {
   const { t } = useLanguage();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalItems: 0,
     tradeableItems: 0,
@@ -33,6 +34,8 @@ export function QuickStats() {
         }
       } catch {
         /* silent */
+      } finally {
+        setLoading(false);
       }
     }
     load();
@@ -53,7 +56,11 @@ export function QuickStats() {
             {card.label}
           </div>
           <div className={`text-lg font-mono font-bold mt-1 ${card.color}`}>
-            {card.value}
+            {loading ? (
+              <div className="h-6 w-16 mx-auto rounded bg-habbo-border/30 animate-pulse" />
+            ) : (
+              card.value
+            )}
           </div>
         </PixelCard>
       ))}

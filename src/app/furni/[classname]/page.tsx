@@ -304,7 +304,7 @@ export default function FurniDetailPage({
                 <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
                   {t.furniDetail.tradeVolume}
                 </h2>
-                <VolumeChart history={history} />
+                <VolumeChart history={history} label={t.furniDetail.volume} />
               </PixelCard>
 
               {comData && deData && (

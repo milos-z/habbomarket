@@ -292,7 +292,7 @@ export default function PortfolioPage() {
                     <td className="text-center py-3">
                       <button
                         onClick={() => removeEntry(entry.classname)}
-                        className="text-habbo-text-dim hover:text-habbo-red text-xs transition-colors opacity-0 group-hover:opacity-100"
+                        className="text-habbo-text-dim hover:text-habbo-red text-xs transition-colors sm:opacity-0 sm:group-hover:opacity-100"
                       >
                         ×
                       </button>

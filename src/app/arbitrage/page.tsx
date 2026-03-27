@@ -223,6 +223,7 @@ export default function ArbitragePage() {
             sortKey={sortKey}
             sortAsc={sortAsc}
             onSort={handleSort}
+            itemLabel={t.compare.item}
             comPriceLabel={t.arbitrage.comPrice}
             dePriceLabel={t.arbitrage.dePrice}
             diffLabel={t.arbitrage.diff}

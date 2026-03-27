@@ -2,6 +2,7 @@
 
 import { TradeFairness } from "@/lib/types";
 import { formatCredits } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface FairnessIndicatorProps {
   giveTotal: number;
@@ -50,6 +51,7 @@ const fairnessConfig: Record<TradeFairness, { color: string; bg: string; glow: s
 };
 
 export function FairnessIndicator({ giveTotal, receiveTotal, loading }: FairnessIndicatorProps) {
+  const { t } = useLanguage();
   const hasValues = giveTotal > 0 || receiveTotal > 0;
 
   if (loading || !hasValues) {
@@ -67,14 +69,18 @@ export function FairnessIndicator({ giveTotal, receiveTotal, loading }: Fairness
 
   const { fairness, diffPercent, diffAbsolute } = calculateFairness(giveTotal, receiveTotal);
   const config = fairnessConfig[fairness];
-  const edgeSide = giveTotal > receiveTotal ? "give" : "receive";
+
+  const fairnessLabel =
+    fairness === TradeFairness.FAIR
+      ? t.trade.fairTrade
+      : fairness === TradeFairness.SLIGHT_EDGE
+        ? t.trade.slightEdge
+        : t.trade.unfairTrade;
 
   return (
     <div className={`flex flex-col items-center gap-2 p-3 rounded-lg border ${config.bg} ${config.glow} transition-all duration-500`}>
       <div className={`font-[family-name:var(--font-pixel)] text-[10px] ${config.color} uppercase tracking-wider`}>
-        {fairness === TradeFairness.FAIR && "Fair Trade"}
-        {fairness === TradeFairness.SLIGHT_EDGE && "Slight Edge"}
-        {fairness === TradeFairness.UNFAIR && "Unfair"}
+        {fairnessLabel}
       </div>
 
       <div className="flex items-center gap-1.5">
@@ -85,7 +91,7 @@ export function FairnessIndicator({ giveTotal, receiveTotal, loading }: Fairness
 
       {diffAbsolute > 0 && (
         <div className="text-[10px] text-habbo-text-dim text-center">
-          {formatCredits(diffAbsolute)}c {edgeSide === "give" ? "overpay" : "profit"}
+          {formatCredits(diffAbsolute)}c {t.trade.difference.toLowerCase()}
         </div>
       )}
 

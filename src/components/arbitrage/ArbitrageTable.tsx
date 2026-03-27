@@ -13,6 +13,7 @@ interface ArbitrageTableProps {
   sortKey: SortKey;
   sortAsc: boolean;
   onSort: (key: SortKey) => void;
+  itemLabel: string;
   comPriceLabel: string;
   dePriceLabel: string;
   diffLabel: string;
@@ -26,6 +27,7 @@ export function ArbitrageTable({
   sortKey,
   sortAsc,
   onSort,
+  itemLabel,
   comPriceLabel,
   dePriceLabel,
   diffLabel,
@@ -72,7 +74,7 @@ export function ArbitrageTable({
         <thead>
           <tr className="border-b border-habbo-border">
             <th className="text-left py-2 px-2">
-              <SortHeader label="Item" field="name" />
+              <SortHeader label={itemLabel} field="name" />
             </th>
             <th className="text-right py-2 px-2">
               <SortHeader label={comPriceLabel} field="comVolume" />

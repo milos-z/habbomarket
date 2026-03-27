@@ -189,7 +189,7 @@ export function TradeSide({
               </div>
               <button
                 onClick={() => onRemove(item.classname)}
-                className="text-habbo-text-dim hover:text-habbo-red text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                className="text-habbo-text-dim hover:text-habbo-red text-xs sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
               >
                 ×
               </button>

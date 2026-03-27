@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import type { FurniItem, CatalogFilters } from "@/lib/types";
 import { SortField, SortDirection, HotelDomain } from "@/lib/types";
 import { DEFAULT_FILTERS, ITEMS_PER_PAGE } from "@/lib/constants";
@@ -10,9 +11,21 @@ import { Pagination } from "@/components/common/Pagination";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export default function CatalogPage() {
+  return (
+    <Suspense>
+      <CatalogContent />
+    </Suspense>
+  );
+}
+
+function CatalogContent() {
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
   const [allItems, setAllItems] = useState<FurniItem[]>([]);
-  const [filters, setFilters] = useState<CatalogFilters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<CatalogFilters>(() => {
+    const categoryFromUrl = searchParams.get("category") ?? "";
+    return { ...DEFAULT_FILTERS, category: categoryFromUrl };
+  });
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async (hotel: HotelDomain) => {
@@ -73,7 +86,6 @@ export default function CatalogPage() {
       const dir = filters.sortDirection === SortDirection.ASC ? 1 : -1;
       switch (filters.sortField) {
         case SortField.NAME:
-          return a.name.localeCompare(b.name) * dir;
         default:
           return a.name.localeCompare(b.name) * dir;
       }
@@ -82,14 +94,27 @@ export default function CatalogPage() {
     return result;
   }, [allItems, filters]);
 
-  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+
+  const clampedPage = Math.min(filters.page, totalPages);
+  useEffect(() => {
+    if (filters.page > totalPages && totalPages > 0) {
+      setFilters((prev) => ({ ...prev, page: 1 }));
+    }
+  }, [filters.page, totalPages]);
+
   const paginatedItems = filteredItems.slice(
-    (filters.page - 1) * ITEMS_PER_PAGE,
-    filters.page * ITEMS_PER_PAGE
+    (clampedPage - 1) * ITEMS_PER_PAGE,
+    clampedPage * ITEMS_PER_PAGE
   );
 
   function updateFilters(patch: Partial<CatalogFilters>) {
-    setFilters((prev) => ({ ...prev, ...patch }));
+    const hasFilterChange = Object.keys(patch).some((k) => k !== "page");
+    setFilters((prev) => ({
+      ...prev,
+      ...patch,
+      ...(hasFilterChange && !("page" in patch) ? { page: 1 } : {}),
+    }));
   }
 
   return (
@@ -135,7 +160,7 @@ export default function CatalogPage() {
           <FurniGrid items={paginatedItems} loading={loading} />
 
           <Pagination
-            currentPage={filters.page}
+            currentPage={clampedPage}
             totalPages={totalPages}
             onPageChange={(page) => updateFilters({ page })}
           />

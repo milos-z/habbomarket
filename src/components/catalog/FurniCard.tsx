@@ -52,7 +52,7 @@ export function FurniCard({ item }: FurniCardProps) {
           className={`absolute top-0 left-0 w-6 h-6 rounded text-sm flex items-center justify-center transition-all ${
             faved
               ? "text-red-400"
-              : "text-habbo-text-dim/30 opacity-0 group-hover:opacity-100"
+              : "text-habbo-text-dim/30 sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
           {faved ? "♥" : "♡"}
@@ -63,7 +63,7 @@ export function FurniCard({ item }: FurniCardProps) {
           className={`absolute top-0 right-0 w-6 h-6 rounded text-[10px] flex items-center justify-center transition-all ${
             inCompare
               ? "bg-habbo-cyan/30 text-habbo-cyan border border-habbo-cyan/50"
-              : "bg-habbo-card/80 text-habbo-text-dim border border-habbo-border opacity-0 group-hover:opacity-100"
+              : "bg-habbo-card/80 text-habbo-text-dim border border-habbo-border sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
           {inCompare ? "✓" : "+"}
