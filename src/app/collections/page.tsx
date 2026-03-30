@@ -157,7 +157,7 @@ export default function CollectionsPage() {
                         key={item.classname}
                         className="w-8 h-8 flex items-center justify-center bg-habbo-bg/40 rounded"
                       >
-                        <FurniImage classname={item.classname} alt={item.name} size="sm" />
+                        <FurniImage classname={item.classname} alt={item.name} size="sm" revision={item.revision} />
                       </div>
                     ))}
                     {collection.items.length > 6 && (
@@ -203,6 +203,7 @@ export default function CollectionsPage() {
                             classname={item.classname}
                             alt={item.name}
                             size="sm"
+                            revision={item.revision}
                             className="group-hover:scale-110 transition-transform"
                           />
                         </div>

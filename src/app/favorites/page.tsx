@@ -112,6 +112,7 @@ export default function FavoritesPage() {
                     classname={item.classname}
                     alt={item.name}
                     size="lg"
+                    revision={item.revision}
                     className="drop-shadow-lg group-hover:scale-110 transition-transform"
                   />
                 </div>

@@ -255,7 +255,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         : "text-habbo-text-dim hover:text-habbo-text hover:bg-habbo-card/50"
                     }`}
                   >
-                    <FurniImage classname={item.classname} alt={item.name} size="sm" />
+                    <FurniImage classname={item.classname} alt={item.name} size="sm" revision={item.revision} />
                     <div className="min-w-0 flex-1">
                       <div className="text-xs truncate">{item.name}</div>
                       <div className="text-[10px] text-habbo-text-dim/60 truncate">

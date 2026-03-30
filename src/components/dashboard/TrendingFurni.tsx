@@ -107,6 +107,7 @@ export function TrendingFurni() {
                 classname={item.classname}
                 alt={item.name}
                 size="sm"
+                revision={item.revision}
                 className="group-hover:scale-110 transition-transform"
               />
               <div className="flex-1 min-w-0">

@@ -109,6 +109,7 @@ export function SpotlightCarousel() {
               classname={current.classname}
               alt={current.name}
               size="lg"
+              revision={current.revision}
               className="drop-shadow-xl group-hover:scale-110 transition-transform"
             />
           </Link>

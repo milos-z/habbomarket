@@ -459,6 +459,7 @@ export default function FurniDetailPage({
                     classname={item.classname}
                     alt={item.name}
                     size="md"
+                    revision={item.revision}
                     className="group-hover:scale-110 transition-transform"
                   />
                 </div>
