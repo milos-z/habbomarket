@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const classname = searchParams.get("classname");
-    const hotel = searchParams.get("hotel") || "com";
+    const hotel = searchParams.get("hotel") || "de";
     const days = searchParams.get("days") || "90";
 
     if (!classname) {

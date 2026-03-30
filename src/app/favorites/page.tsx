@@ -5,12 +5,15 @@ import Link from "next/link";
 import type { FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
 import { PixelCard } from "@/components/common/PixelCard";
+import { PixelButton } from "@/components/common/PixelButton";
 import { FurniImage } from "@/components/common/FurniImage";
 import { useFavorites } from "@/components/providers/FavoritesProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 
 export default function FavoritesPage() {
-  const { favorites, removeFavorite } = useFavorites();
+  const { favorites, removeFavorite, exportData, importData } = useFavorites();
   const { t } = useLanguage();
   const [furniMap, setFurniMap] = useState<Record<string, FurniItem>>({});
   const [loading, setLoading] = useState(true);
@@ -19,7 +22,7 @@ export default function FavoritesPage() {
     async function load() {
       try {
         const res = await fetch(
-          `/api/furnidata?hotel=${HotelDomain.COM}&tradeableOnly=false`
+          `/api/furnidata?hotel=${HotelDomain.DE}&tradeableOnly=false`
         );
         if (res.ok) {
           const all: FurniItem[] = await res.json();
@@ -42,11 +45,24 @@ export default function FavoritesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <div>
-        <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
-          {t.favorites.title}
-        </h1>
-        <p className="text-sm text-habbo-text-dim mt-1">{t.favorites.subtitle}</p>
+      <Breadcrumbs segments={[{ label: t.nav.favorites }]} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
+            {t.favorites.title}
+          </h1>
+          <p className="text-sm text-habbo-text-dim mt-1">{t.favorites.subtitle}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <PixelButton variant="ghost" size="sm" onClick={importData}>
+            Import
+          </PixelButton>
+          {favorites.length > 0 && (
+            <PixelButton variant="ghost" size="sm" onClick={exportData}>
+              Export
+            </PixelButton>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -56,20 +72,26 @@ export default function FavoritesPage() {
           ))}
         </div>
       ) : favorites.length === 0 ? (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">♡</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.favorites.empty}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.favorites.emptyHint}
-          </p>
-          <Link
-            href="/catalog"
-            className="inline-block mt-4 text-sm text-habbo-cyan hover:underline"
-          >
-            {t.nav.catalog} →
-          </Link>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-red/10 border border-habbo-red/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-red"><PixelIcon name="heart-outline" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.favorites.empty}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.favorites.emptyHint}
+            </p>
+            <Link
+              href="/catalog"
+              className="inline-flex items-center gap-1.5 mt-5 text-sm text-habbo-cyan hover:text-habbo-gold transition-colors"
+            >
+              <PixelIcon name="search" size="xs" />
+              {t.nav.catalog}
+            </Link>
+          </div>
         </PixelCard>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -80,9 +102,9 @@ export default function FavoritesPage() {
             >
               <button
                 onClick={() => removeFavorite(item.classname)}
-                className="absolute top-2 right-2 w-6 h-6 text-red-400 hover:text-red-300 text-sm flex items-center justify-center transition-colors z-10"
+                className="absolute top-2 right-2 w-6 h-6 text-red-400 hover:text-red-300 flex items-center justify-center transition-colors z-10"
               >
-                ♥
+                <PixelIcon name="heart" size="sm" />
               </button>
               <Link href={`/furni/${encodeURIComponent(item.classname)}`}>
                 <div className="w-full h-20 flex items-center justify-center mb-2">
@@ -116,9 +138,9 @@ export default function FavoritesPage() {
               >
                 <button
                   onClick={() => removeFavorite(cn)}
-                  className="absolute top-2 right-2 w-6 h-6 text-red-400/50 hover:text-red-300 text-sm flex items-center justify-center transition-colors"
+                  className="absolute top-2 right-2 w-6 h-6 text-red-400/50 hover:text-red-300 flex items-center justify-center transition-colors"
                 >
-                  ♥
+                  <PixelIcon name="heart" size="sm" />
                 </button>
                 <div className="w-full h-20 flex items-center justify-center mb-2">
                   <FurniImage classname={cn} alt={cn} size="lg" />

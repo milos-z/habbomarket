@@ -5,7 +5,7 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits, calculatePriceChange, exportToCSV } from "@/lib/utils";
+import { formatCredits, formatPrice, calculatePriceChange, exportToCSV } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
@@ -15,6 +15,8 @@ import { FurniImage } from "@/components/common/FurniImage";
 import { CompareChart } from "@/components/charts/CompareChart";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import type { FurniItem } from "@/lib/types";
 
 type DayRange = "7" | "30" | "90" | "180" | "365" | "all";
@@ -40,7 +42,7 @@ export default function ComparePage() {
   const handleAddFromSearch = useCallback((item: FurniItem) => {
     addItem({ classname: item.classname, name: item.name });
   }, [addItem]);
-  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.DE);
   const [days, setDays] = useState<DayRange>("90");
   const [entries, setEntries] = useState<MarketEntry[]>([]);
 
@@ -98,6 +100,7 @@ export default function ComparePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Breadcrumbs segments={[{ label: t.nav.compare }]} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
@@ -137,21 +140,26 @@ export default function ComparePage() {
       </div>
 
       {items.length === 0 && (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">📊</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-3">
-            {t.compare.noItems}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 mb-4 max-w-md mx-auto">
-            {hintParts[0]}
-            {catalogLink}
-            {hintParts[1]}
-          </p>
-          <SearchBar
-            placeholder={t.compare.searchToAdd}
-            className="max-w-sm mx-auto"
-            onSelect={handleAddFromSearch}
-          />
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-cyan/10 border border-habbo-cyan/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-cyan"><PixelIcon name="compare" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-3">
+              {t.compare.noItems}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 mb-5 max-w-md mx-auto">
+              {hintParts[0]}
+              {catalogLink}
+              {hintParts[1]}
+            </p>
+            <SearchBar
+              placeholder={t.compare.searchToAdd}
+              className="max-w-sm mx-auto"
+              onSelect={handleAddFromSearch}
+            />
+          </div>
         </PixelCard>
       )}
 
@@ -176,7 +184,7 @@ export default function ComparePage() {
                 </Link>
                 {entry.data && (
                   <div className="text-[10px] font-mono text-habbo-text-dim">
-                    {formatCredits(entry.data.marketData.averagePrice)}c {t.compare.avgLabel}
+                    {formatPrice(entry.data.marketData.averagePrice)} {t.compare.avgLabel}
                   </div>
                 )}
               </div>
@@ -311,7 +319,7 @@ export default function ComparePage() {
                         </div>
                       </td>
                       <td className="text-right font-mono text-xs text-habbo-cyan">
-                        {formatCredits(entry.data!.marketData.averagePrice)}
+                        {formatPrice(entry.data!.marketData.averagePrice)}
                       </td>
                       <td
                         className={`text-right font-mono text-xs ${

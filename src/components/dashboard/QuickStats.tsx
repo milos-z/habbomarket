@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { HotelDomain } from "@/lib/types";
 import type { FurniItem } from "@/lib/types";
 import { PixelCard } from "@/components/common/PixelCard";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { SectionHeader } from "@/components/common/SectionHeader";
+import type { PixelIconName } from "@/components/common/PixelIcon";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 
 export function QuickStats() {
   const { t } = useLanguage();
@@ -20,7 +24,7 @@ export function QuickStats() {
     async function load() {
       try {
         const res = await fetch(
-          `/api/furnidata?hotel=${HotelDomain.COM}&tradeableOnly=false`
+          `/api/furnidata?hotel=${HotelDomain.DE}&tradeableOnly=false`
         );
         if (res.ok) {
           const items: FurniItem[] = await res.json();
@@ -41,29 +45,43 @@ export function QuickStats() {
     load();
   }, []);
 
-  const cards = [
-    { label: t.dashboard.totalFurni, value: stats.totalItems.toLocaleString(), color: "text-habbo-cyan" },
-    { label: t.dashboard.tradeable, value: stats.tradeableItems.toLocaleString(), color: "text-habbo-green" },
-    { label: t.dashboard.rares, value: stats.rareItems.toLocaleString(), color: "text-habbo-gold" },
-    { label: t.dashboard.categories, value: stats.categories.toString(), color: "text-habbo-purple" },
+  const cards: Array<{
+    label: string;
+    numValue: number;
+    color: string;
+    icon: PixelIconName;
+    iconColor: string;
+  }> = [
+    { label: t.dashboard.totalFurni, numValue: stats.totalItems, color: "text-habbo-cyan", icon: "box", iconColor: "text-habbo-cyan/50" },
+    { label: t.dashboard.tradeable, numValue: stats.tradeableItems, color: "text-habbo-green", icon: "trade", iconColor: "text-habbo-green/50" },
+    { label: t.dashboard.rares, numValue: stats.rareItems, color: "text-habbo-gold", icon: "star", iconColor: "text-habbo-gold/50" },
+    { label: t.dashboard.categories, numValue: stats.categories, color: "text-habbo-purple", icon: "shelf", iconColor: "text-habbo-purple/50" },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {cards.map((card) => (
-        <PixelCard key={card.label} className="p-4 text-center">
-          <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase tracking-wider">
-            {card.label}
+    <PixelCard className="p-4">
+      <SectionHeader title="Habbo.de Stats" icon="arbitrage" color="cyan" />
+      <div className="grid grid-cols-2 gap-3">
+        {cards.map((card) => (
+          <div key={card.label} className="flex items-center gap-3 p-2.5 rounded-lg bg-habbo-bg/40">
+            <span className={card.iconColor}>
+              <PixelIcon name={card.icon} size="lg" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[9px] text-habbo-text-dim uppercase tracking-wider truncate">
+                {card.label}
+              </div>
+              <div className={`text-base font-mono font-bold ${card.color}`}>
+                {loading ? (
+                  <div className="h-5 w-12 rounded bg-habbo-border/30 animate-pulse" />
+                ) : (
+                  <AnimatedNumber value={card.numValue} />
+                )}
+              </div>
+            </div>
           </div>
-          <div className={`text-lg font-mono font-bold mt-1 ${card.color}`}>
-            {loading ? (
-              <div className="h-6 w-16 mx-auto rounded bg-habbo-border/30 animate-pulse" />
-            ) : (
-              card.value
-            )}
-          </div>
-        </PixelCard>
-      ))}
-    </div>
+        ))}
+      </div>
+    </PixelCard>
   );
 }

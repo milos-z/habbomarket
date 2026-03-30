@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CompareItem } from "@/lib/types";
+import { showToast } from "@/components/common/Toast";
 
 const STORAGE_KEY = "habbomarket-compare";
 
@@ -51,10 +52,14 @@ export function CompareProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((item: CompareItem) => {
     setItems((prev) => {
-      if (prev.length >= MAX_COMPARE_ITEMS) return prev;
+      if (prev.length >= MAX_COMPARE_ITEMS) {
+        showToast("Compare list is full (max 4)", "warning");
+        return prev;
+      }
       if (prev.some((i) => i.classname === item.classname)) return prev;
       const next = [...prev, item];
       saveToStorage(next);
+      showToast(`Added "${item.name}" to compare`, "success");
       return next;
     });
   }, []);
@@ -63,6 +68,7 @@ export function CompareProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const next = prev.filter((i) => i.classname !== classname);
       saveToStorage(next);
+      showToast("Removed from compare", "info");
       return next;
     });
   }, []);
@@ -70,6 +76,7 @@ export function CompareProvider({ children }: { children: ReactNode }) {
   const clearItems = useCallback(() => {
     setItems([]);
     saveToStorage([]);
+    showToast("Compare list cleared", "info");
   }, []);
 
   const hasItem = useCallback(

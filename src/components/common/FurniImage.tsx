@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { furniImageUrl } from "@/lib/utils";
 
 interface FurniImageProps {
@@ -8,9 +8,10 @@ interface FurniImageProps {
   alt: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  revision?: number;
 }
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 2;
 const RETRY_DELAY = 2000;
 
 const sizeClasses = {
@@ -24,28 +25,30 @@ export function FurniImage({
   alt,
   className = "",
   size = "md",
+  revision,
 }: FurniImageProps) {
-  const [src, setSrc] = useState(furniImageUrl(classname));
+  const [src, setSrc] = useState(furniImageUrl(classname, revision));
   const [failed, setFailed] = useState(false);
   const [retries, setRetries] = useState(0);
 
   useEffect(() => {
-    setSrc(furniImageUrl(classname));
+    setSrc(furniImageUrl(classname, revision));
     setFailed(false);
     setRetries(0);
-  }, [classname]);
+  }, [classname, revision]);
 
-  const handleError = useCallback(() => {
+  function handleError() {
     if (retries < MAX_RETRIES) {
-      const timer = setTimeout(() => {
-        setSrc(`${furniImageUrl(classname)}?r=${retries + 1}`);
+      setTimeout(() => {
+        const baseUrl = furniImageUrl(classname, revision);
+        const sep = baseUrl.includes("?") ? "&" : "?";
+        setSrc(`${baseUrl}${sep}_r=${retries + 1}`);
         setRetries((r) => r + 1);
       }, RETRY_DELAY);
-      return () => clearTimeout(timer);
     } else {
       setFailed(true);
     }
-  }, [classname, retries]);
+  }
 
   if (failed) {
     return (

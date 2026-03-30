@@ -3,7 +3,7 @@
 import type { PriceAlert } from "@/lib/types";
 import { AlertStatus, AlertDirection } from "@/lib/types";
 import { HOTELS } from "@/lib/constants";
-import { formatCredits } from "@/lib/utils";
+import { formatCredits, formatPrice } from "@/lib/utils";
 import { FurniImage } from "@/components/common/FurniImage";
 import { PixelButton } from "@/components/common/PixelButton";
 import Link from "next/link";
@@ -87,7 +87,7 @@ export function AlertCard({ alert, onSnooze, onReactivate, onDelete, t }: AlertC
           </span>
           {alert.currentPrice > 0 && (
             <span className="text-[10px] font-mono text-habbo-cyan">
-              {t.alerts.currentPrice}: {formatCredits(alert.currentPrice)}c
+              {t.alerts.currentPrice}: {formatPrice(alert.currentPrice)}
             </span>
           )}
         </div>

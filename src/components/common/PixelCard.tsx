@@ -8,6 +8,8 @@ interface PixelCardProps {
   gold?: boolean;
   hover?: boolean;
   onClick?: () => void;
+  onTouchStart?: React.TouchEventHandler<HTMLElement>;
+  onTouchEnd?: React.TouchEventHandler<HTMLElement>;
 }
 
 export function PixelCard({
@@ -16,6 +18,8 @@ export function PixelCard({
   gold = false,
   hover = false,
   onClick,
+  onTouchStart,
+  onTouchEnd,
 }: PixelCardProps) {
   const base = "bg-habbo-card rounded-lg";
   const border = gold ? "pixel-border-gold" : "pixel-border";
@@ -28,6 +32,8 @@ export function PixelCard({
     <Tag
       className={`${base} ${border} ${hoverStyle} ${className}`}
       onClick={onClick}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       {children}
     </Tag>

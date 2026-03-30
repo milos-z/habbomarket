@@ -4,8 +4,8 @@ import { Language } from "@/lib/i18n";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const LANGUAGES = [
-  { code: Language.DE, label: "DE", flag: "🇩🇪" },
-  { code: Language.EN, label: "EN", flag: "🇬🇧" },
+  { code: Language.DE, label: "DE" },
+  { code: Language.EN, label: "EN" },
 ];
 
 export function LanguageSelector() {
@@ -18,7 +18,7 @@ export function LanguageSelector() {
           key={lang.code}
           onClick={() => setLanguage(lang.code)}
           className={`
-            px-2 py-1 text-[10px] font-medium transition-colors flex items-center gap-1
+            px-2.5 py-1 text-[10px] font-mono font-bold transition-colors
             ${
               language === lang.code
                 ? "bg-habbo-gold/20 text-habbo-gold"
@@ -26,8 +26,7 @@ export function LanguageSelector() {
             }
           `}
         >
-          <span>{lang.flag}</span>
-          <span>{lang.label}</span>
+          {lang.label}
         </button>
       ))}
     </div>

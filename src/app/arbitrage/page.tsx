@@ -11,6 +11,8 @@ import { PixelButton } from "@/components/common/PixelButton";
 import { ArbitrageTable } from "@/components/arbitrage/ArbitrageTable";
 import { ScanProgress } from "@/components/arbitrage/ScanProgress";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 
 type SortKey = "name" | "difference" | "differencePercent" | "comVolume" | "deVolume";
 
@@ -134,6 +136,7 @@ export default function ArbitragePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Breadcrumbs segments={[{ label: t.nav.arbitrage }]} />
       <div>
         <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
           {t.arbitrage.title}
@@ -233,24 +236,34 @@ export default function ArbitragePage() {
           />
         </PixelCard>
       ) : scanned > 0 && !scanning ? (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">🔍</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.arbitrage.noResults}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.arbitrage.noResultsHint}
-          </p>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-text-dim/10 border border-habbo-border flex items-center justify-center animate-float">
+              <span className="text-habbo-text-dim"><PixelIcon name="search" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.arbitrage.noResults}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.arbitrage.noResultsHint}
+            </p>
+          </div>
         </PixelCard>
       ) : !scanning && scanned === 0 ? (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">📊</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.arbitrage.noResults}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.arbitrage.noResultsHint}
-          </p>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-gold/10 border border-habbo-gold/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-gold"><PixelIcon name="arbitrage" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.arbitrage.noResults}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.arbitrage.noResultsHint}
+            </p>
+          </div>
         </PixelCard>
       ) : null}
     </div>

@@ -3,14 +3,16 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
+import { PixelIcon } from "@/components/common/PixelIcon";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits, exportToCSV } from "@/lib/utils";
+import { formatCredits, formatPrice, exportToCSV } from "@/lib/utils";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
 import { FurniImage } from "@/components/common/FurniImage";
 import { HotelSelector } from "@/components/common/HotelSelector";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 
 interface PriceInfo {
   avgPrice: number;
@@ -18,10 +20,10 @@ interface PriceInfo {
 }
 
 export default function PortfolioPage() {
-  const { entries, removeEntry, updateQuantity, updateBuyPrice, totalItems } =
+  const { entries, removeEntry, updateQuantity, updateBuyPrice, totalItems, exportData, importData } =
     usePortfolio();
   const { t } = useLanguage();
-  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.DE);
   const [prices, setPrices] = useState<Record<string, PriceInfo>>({});
 
   useEffect(() => {
@@ -95,6 +97,7 @@ export default function PortfolioPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Breadcrumbs segments={[{ label: t.nav.portfolio }]} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
@@ -106,10 +109,18 @@ export default function PortfolioPage() {
         </div>
         <div className="flex items-center gap-3">
           <HotelSelector value={hotel} onChange={setHotel} />
+          <PixelButton variant="ghost" size="sm" onClick={importData}>
+            Import
+          </PixelButton>
           {entries.length > 0 && (
-            <PixelButton variant="ghost" size="sm" onClick={handleExportCSV}>
-              {t.furniDetail.exportCSV}
-            </PixelButton>
+            <>
+              <PixelButton variant="ghost" size="sm" onClick={exportData}>
+                Export JSON
+              </PixelButton>
+              <PixelButton variant="ghost" size="sm" onClick={handleExportCSV}>
+                {t.furniDetail.exportCSV}
+              </PixelButton>
+            </>
           )}
         </div>
       </div>
@@ -151,20 +162,26 @@ export default function PortfolioPage() {
       )}
 
       {entries.length === 0 ? (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">📦</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.portfolio.empty}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.portfolio.emptyHint}
-          </p>
-          <Link
-            href="/catalog"
-            className="inline-block mt-4 text-sm text-habbo-cyan hover:underline"
-          >
-            {t.nav.catalog} →
-          </Link>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-cyan/10 border border-habbo-cyan/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-cyan"><PixelIcon name="box" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.portfolio.empty}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.portfolio.emptyHint}
+            </p>
+            <Link
+              href="/catalog"
+              className="inline-flex items-center gap-1.5 mt-5 text-sm text-habbo-cyan hover:text-habbo-gold transition-colors"
+            >
+              <PixelIcon name="search" size="xs" />
+              {t.nav.catalog}
+            </Link>
+          </div>
         </PixelCard>
       ) : (
         <PixelCard className="p-4 overflow-x-auto">
@@ -268,11 +285,11 @@ export default function PortfolioPage() {
                       {price?.loading ? (
                         <span className="inline-block w-4 h-4 border-2 border-habbo-cyan/20 border-t-habbo-cyan rounded-full animate-spin" />
                       ) : (
-                        `${formatCredits(avg)}c`
+                        formatPrice(avg)
                       )}
                     </td>
                     <td className="text-right font-mono text-xs text-habbo-gold py-3">
-                      {price?.loading ? "..." : `${formatCredits(itemValue)}c`}
+                      {price?.loading ? "..." : formatPrice(itemValue)}
                     </td>
                     <td
                       className={`text-right font-mono text-xs py-3 ${

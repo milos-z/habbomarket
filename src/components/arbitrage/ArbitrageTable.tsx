@@ -2,7 +2,7 @@
 
 import type { ArbitrageResult } from "@/lib/types";
 import { ArbitrageDirection } from "@/lib/types";
-import { formatCredits } from "@/lib/utils";
+import { formatCredits, formatPrice } from "@/lib/utils";
 import { FurniImage } from "@/components/common/FurniImage";
 import Link from "next/link";
 
@@ -105,11 +105,11 @@ export function ArbitrageTable({
                 </Link>
               </td>
               <td className="text-right py-2 px-2">
-                <div className="text-xs font-mono text-habbo-cyan">{formatCredits(r.comPrice)}c</div>
+                <div className="text-xs font-mono text-habbo-cyan">{formatPrice(r.comPrice)}</div>
                 <div className="text-[10px] font-mono text-habbo-text-dim">vol: {r.comVolume}</div>
               </td>
               <td className="text-right py-2 px-2">
-                <div className="text-xs font-mono text-habbo-cyan">{formatCredits(r.dePrice)}c</div>
+                <div className="text-xs font-mono text-habbo-cyan">{formatPrice(r.dePrice)}</div>
                 <div className="text-[10px] font-mono text-habbo-text-dim">vol: {r.deVolume}</div>
               </td>
               <td className="text-right py-2 px-2">

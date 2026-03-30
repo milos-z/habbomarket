@@ -76,7 +76,7 @@ export function SearchBar({
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/furnidata?hotel=${HotelDomain.COM}&search=${encodeURIComponent(term)}&limit=8`
+          `/api/furnidata?hotel=${HotelDomain.DE}&search=${encodeURIComponent(term)}&limit=8`
         );
         if (res.ok) {
           const data: FurniItem[] = await res.json();
@@ -198,7 +198,7 @@ export function SearchBar({
               onClick={() => handleSelect(item)}
               className="w-full flex items-center gap-3 px-3 py-2 hover:bg-habbo-card transition-colors text-left"
             >
-              <FurniImage classname={item.classname} alt={item.name} size="md" />
+              <FurniImage classname={item.classname} alt={item.name} size="md" revision={item.revision} />
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-habbo-text truncate">
                   {item.name}

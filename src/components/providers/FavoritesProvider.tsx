@@ -9,6 +9,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { showToast } from "@/components/common/Toast";
+
 const STORAGE_KEY = "habbomarket-favorites";
 
 interface FavoritesContextValue {
@@ -17,6 +19,8 @@ interface FavoritesContextValue {
   removeFavorite: (classname: string) => void;
   toggleFavorite: (classname: string) => void;
   isFavorite: (classname: string) => boolean;
+  exportData: () => void;
+  importData: () => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextValue | null>(null);
@@ -65,10 +69,15 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const toggleFavorite = useCallback((classname: string) => {
     setFavorites((prev) => {
-      const next = prev.includes(classname)
+      const wasFaved = prev.includes(classname);
+      const next = wasFaved
         ? prev.filter((c) => c !== classname)
         : [...prev, classname];
       saveToStorage(next);
+      showToast(
+        wasFaved ? "Removed from favorites" : "Added to favorites",
+        wasFaved ? "info" : "success"
+      );
       return next;
     });
   }, []);
@@ -78,8 +87,30 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     [favorites]
   );
 
+  const exportData = useCallback(() => {
+    import("@/lib/utils").then(({ exportToJSON }) => {
+      exportToJSON("habbomarket-favorites", favorites);
+    });
+  }, [favorites]);
+
+  const importData = useCallback(() => {
+    import("@/lib/utils").then(({ importFromJSON }) => {
+      importFromJSON<string[]>().then((data) => {
+        if (Array.isArray(data) && data.every((item) => typeof item === "string")) {
+          setFavorites(data);
+          saveToStorage(data);
+          showToast(`Imported ${data.length} favorites`, "success");
+        } else {
+          showToast("Invalid favorites data format", "warning");
+        }
+      }).catch(() => {
+        showToast("Import failed", "warning");
+      });
+    });
+  }, []);
+
   return (
-    <FavoritesContext value={{ favorites, addFavorite, removeFavorite, toggleFavorite, isFavorite }}>
+    <FavoritesContext value={{ favorites, addFavorite, removeFavorite, toggleFavorite, isFavorite, exportData, importData }}>
       {children}
     </FavoritesContext>
   );

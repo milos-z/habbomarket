@@ -9,6 +9,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { showToast } from "@/components/common/Toast";
+
 const STORAGE_KEY = "habbomarket-portfolio";
 
 export interface PortfolioEntry {
@@ -26,6 +28,8 @@ interface PortfolioContextValue {
   updateBuyPrice: (classname: string, buyPrice: number | undefined) => void;
   getEntry: (classname: string) => PortfolioEntry | undefined;
   totalItems: number;
+  exportData: () => void;
+  importData: () => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextValue | null>(null);
@@ -65,8 +69,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
             ? { ...e, quantity: e.quantity + quantity }
             : e
         );
+        showToast(`Updated "${name}" quantity in portfolio`, "success");
       } else {
         next = [...prev, { classname, name, quantity }];
+        showToast(`Added "${name}" to portfolio`, "success");
       }
       saveToStorage(next);
       return next;
@@ -77,6 +83,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     setEntries((prev) => {
       const next = prev.filter((e) => e.classname !== classname);
       saveToStorage(next);
+      showToast("Removed from portfolio", "info");
       return next;
     });
   }, []);
@@ -111,9 +118,31 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
 
   const totalItems = entries.reduce((sum, e) => sum + e.quantity, 0);
 
+  const exportData = useCallback(() => {
+    import("@/lib/utils").then(({ exportToJSON }) => {
+      exportToJSON("habbomarket-portfolio", entries);
+    });
+  }, [entries]);
+
+  const importData = useCallback(() => {
+    import("@/lib/utils").then(({ importFromJSON }) => {
+      importFromJSON<PortfolioEntry[]>().then((data) => {
+        if (Array.isArray(data) && data.every((e) => e.classname && e.name && typeof e.quantity === "number")) {
+          setEntries(data);
+          saveToStorage(data);
+          showToast(`Imported ${data.length} portfolio entries`, "success");
+        } else {
+          showToast("Invalid portfolio data format", "warning");
+        }
+      }).catch(() => {
+        showToast("Import failed", "warning");
+      });
+    });
+  }, []);
+
   return (
     <PortfolioContext
-      value={{ entries, addEntry, removeEntry, updateQuantity, updateBuyPrice, getEntry, totalItems }}
+      value={{ entries, addEntry, removeEntry, updateQuantity, updateBuyPrice, getEntry, totalItems, exportData, importData }}
     >
       {children}
     </PortfolioContext>

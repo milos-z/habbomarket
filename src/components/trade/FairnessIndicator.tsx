@@ -2,6 +2,7 @@
 
 import { TradeFairness } from "@/lib/types";
 import { formatCredits } from "@/lib/utils";
+import { PixelIcon } from "@/components/common/PixelIcon";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface FairnessIndicatorProps {
@@ -32,21 +33,24 @@ function calculateFairness(giveTotal: number, receiveTotal: number): {
   return { fairness: TradeFairness.UNFAIR, diffPercent, diffAbsolute };
 }
 
-const fairnessConfig: Record<TradeFairness, { color: string; bg: string; glow: string }> = {
+const fairnessConfig: Record<TradeFairness, { color: string; bg: string; glow: string; border: string }> = {
   [TradeFairness.FAIR]: {
     color: "text-habbo-green",
-    bg: "bg-habbo-green/20 border-habbo-green/40",
-    glow: "shadow-[0_0_20px_rgba(61,214,140,0.3)]",
+    bg: "bg-habbo-green/10",
+    border: "border-habbo-green/30",
+    glow: "shadow-[0_0_20px_rgba(61,214,140,0.2)]",
   },
   [TradeFairness.SLIGHT_EDGE]: {
     color: "text-habbo-gold",
-    bg: "bg-habbo-gold/20 border-habbo-gold/40",
-    glow: "shadow-[0_0_20px_rgba(245,200,66,0.3)]",
+    bg: "bg-habbo-gold/10",
+    border: "border-habbo-gold/30",
+    glow: "shadow-[0_0_20px_rgba(245,200,66,0.2)]",
   },
   [TradeFairness.UNFAIR]: {
     color: "text-habbo-red",
-    bg: "bg-habbo-red/20 border-habbo-red/40",
-    glow: "shadow-[0_0_20px_rgba(255,71,87,0.3)]",
+    bg: "bg-habbo-red/10",
+    border: "border-habbo-red/30",
+    glow: "shadow-[0_0_20px_rgba(255,71,87,0.2)]",
   },
 };
 
@@ -57,8 +61,8 @@ export function FairnessIndicator({ giveTotal, receiveTotal, loading }: Fairness
   if (loading || !hasValues) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-4">
-        <div className="w-12 h-12 rounded-full bg-habbo-card border border-habbo-border flex items-center justify-center">
-          <span className="text-habbo-text-dim text-lg">?</span>
+        <div className="w-14 h-14 rounded-xl bg-habbo-card border border-habbo-border flex items-center justify-center">
+          <span className="text-habbo-text-dim"><PixelIcon name="trade" size="lg" /></span>
         </div>
         {loading && (
           <div className="w-4 h-4 border-2 border-habbo-cyan/20 border-t-habbo-cyan rounded-full animate-spin" />
@@ -78,7 +82,11 @@ export function FairnessIndicator({ giveTotal, receiveTotal, loading }: Fairness
         : t.trade.unfairTrade;
 
   return (
-    <div className={`flex flex-col items-center gap-2 p-3 rounded-lg border ${config.bg} ${config.glow} transition-all duration-500`}>
+    <div className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${config.bg} ${config.border} ${config.glow} transition-all duration-500`}>
+      <div className={`w-10 h-10 rounded-lg ${config.bg} border ${config.border} flex items-center justify-center mb-1`}>
+        <span className={config.color}><PixelIcon name="trade" size="md" /></span>
+      </div>
+
       <div className={`font-[family-name:var(--font-pixel)] text-[10px] ${config.color} uppercase tracking-wider`}>
         {fairnessLabel}
       </div>
@@ -95,16 +103,17 @@ export function FairnessIndicator({ giveTotal, receiveTotal, loading }: Fairness
         </div>
       )}
 
-      <div className="flex gap-0.5 mt-1">
+      <div className="flex gap-1 mt-1">
         {[...Array(5)].map((_, i) => {
           const threshold = i * 10;
           const active = diffPercent >= threshold;
           return (
             <div
               key={i}
-              className={`w-2 h-4 rounded-sm transition-all duration-300 ${
-                active ? config.bg.replace("/20", "/60") : "bg-habbo-border/30"
+              className={`w-2.5 h-5 rounded-sm transition-all duration-300 ${
+                active ? `${config.bg} border ${config.border}` : "bg-habbo-border/20"
               }`}
+              style={active ? { backgroundColor: `color-mix(in srgb, currentColor 30%, transparent)` } : undefined}
             />
           );
         })}

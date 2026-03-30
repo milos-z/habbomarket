@@ -5,6 +5,7 @@ import type { FurniItem } from "@/lib/types";
 import { useCompare } from "@/components/providers/CompareProvider";
 import { useFavorites } from "@/components/providers/FavoritesProvider";
 import { FurniImage } from "@/components/common/FurniImage";
+import { PixelIcon } from "@/components/common/PixelIcon";
 
 interface FurniCardProps {
   item: FurniItem;
@@ -43,30 +44,31 @@ export function FurniCard({ item }: FurniCardProps) {
             classname={item.classname}
             alt={item.name}
             size="lg"
+            revision={item.revision}
             className="drop-shadow-lg group-hover:scale-110 transition-transform duration-200"
           />
         </div>
 
         <button
           onClick={handleToggleFavorite}
-          className={`absolute top-0 left-0 w-6 h-6 rounded text-sm flex items-center justify-center transition-all ${
+          className={`absolute top-0 left-0 w-6 h-6 rounded flex items-center justify-center transition-all ${
             faved
               ? "text-red-400"
               : "text-habbo-text-dim/30 sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
-          {faved ? "♥" : "♡"}
+          <PixelIcon name={faved ? "heart" : "heart-outline"} size="sm" />
         </button>
 
         <button
           onClick={handleToggleCompare}
-          className={`absolute top-0 right-0 w-6 h-6 rounded text-[10px] flex items-center justify-center transition-all ${
+          className={`absolute top-0 right-0 w-6 h-6 rounded flex items-center justify-center transition-all ${
             inCompare
               ? "bg-habbo-cyan/30 text-habbo-cyan border border-habbo-cyan/50"
               : "bg-habbo-card/80 text-habbo-text-dim border border-habbo-border sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
-          {inCompare ? "✓" : "+"}
+          <PixelIcon name="compare" size="xs" />
         </button>
 
         {item.rare && (

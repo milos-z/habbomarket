@@ -5,7 +5,7 @@ import Link from "next/link";
 import { HotelDomain } from "@/lib/types";
 import type { MarketData } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
-import { formatCredits, calculatePriceChange, exportToCSV } from "@/lib/utils";
+import { formatCredits, formatPrice, calculatePriceChange, exportToCSV } from "@/lib/utils";
 import { CHART_COLORS } from "@/lib/constants";
 import { PixelCard } from "@/components/common/PixelCard";
 import { PixelButton } from "@/components/common/PixelButton";
@@ -18,6 +18,13 @@ import { useCompare } from "@/components/providers/CompareProvider";
 import { useFavorites } from "@/components/providers/FavoritesProvider";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useAlerts } from "@/components/providers/AlertsProvider";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { showToast } from "@/components/common/Toast";
+import { addRecentlyViewed } from "@/components/dashboard/RecentlyViewed";
+import { AlertDirection } from "@/lib/types";
+import type { FurniItem } from "@/lib/types";
 
 type DayRange = "7" | "30" | "90" | "180" | "365" | "all";
 
@@ -30,7 +37,7 @@ export default function FurniDetailPage({
   const decoded = decodeURIComponent(classname);
   const { t } = useLanguage();
 
-  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.DE);
   const [days, setDays] = useState<DayRange>("90");
   const [data, setData] = useState<MarketData | null>(null);
   const [comData, setComData] = useState<MarketData | null>(null);
@@ -41,8 +48,11 @@ export default function FurniDetailPage({
   const { addItem, removeItem, hasItem } = useCompare();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addEntry: addToPortfolio } = usePortfolio();
+  const { addAlert } = useAlerts();
   const inCompare = hasItem(decoded);
   const faved = isFavorite(decoded);
+  const [relatedItems, setRelatedItems] = useState<FurniItem[]>([]);
+  const [alertTargetPrice, setAlertTargetPrice] = useState("");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -87,6 +97,59 @@ export default function FurniDetailPage({
     loadComparison();
   }, [loadData, loadComparison]);
 
+  useEffect(() => {
+    if (data?.furniName) {
+      addRecentlyViewed(decoded, data.furniName);
+    }
+  }, [data?.furniName, decoded]);
+
+  useEffect(() => {
+    async function loadRelated() {
+      try {
+        const res = await fetch(`/api/furnidata?hotel=${hotel}&tradeableOnly=true&limit=200`);
+        if (res.ok) {
+          const all: FurniItem[] = await res.json();
+          const related = all
+            .filter((i) => i.classname !== decoded)
+            .filter((i) => {
+              if (data?.line && i.furniline === data.line) return true;
+              if (data?.category && i.category === data.category) return true;
+              return false;
+            })
+            .slice(0, 6);
+          setRelatedItems(related);
+        }
+      } catch {
+        /* silent */
+      }
+    }
+    if (data) loadRelated();
+  }, [data, hotel, decoded]);
+
+  function handleShare() {
+    const url = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      showToast("Link copied to clipboard", "success");
+    }
+  }
+
+  function handleQuickAlert(direction: AlertDirection) {
+    const price = parseInt(alertTargetPrice);
+    if (!price || price <= 0) {
+      showToast("Enter a valid target price", "warning");
+      return;
+    }
+    addAlert({
+      classname: decoded,
+      name: data?.furniName ?? decoded,
+      targetPrice: price,
+      direction,
+      hotel,
+    });
+    setAlertTargetPrice("");
+  }
+
   const history = data?.marketData.history ?? [];
   const priceChange = calculatePriceChange(history);
 
@@ -97,14 +160,12 @@ export default function FurniDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="mb-4">
-        <Link
-          href="/catalog"
-          className="text-xs text-habbo-text-dim hover:text-habbo-cyan transition-colors"
-        >
-          {t.furniDetail.backToCatalog}
-        </Link>
-      </div>
+      <Breadcrumbs
+        segments={[
+          { label: t.nav.catalog, href: "/catalog" },
+          { label: data?.furniName ?? decoded },
+        ]}
+      />
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="lg:w-72 shrink-0">
@@ -122,7 +183,7 @@ export default function FurniDetailPage({
                   faved ? "text-red-400 scale-110" : "text-habbo-text-dim/40 hover:text-red-400"
                 }`}
               >
-                {faved ? "♥" : "♡"}
+                <PixelIcon name={faved ? "heart" : "heart-outline"} size="md" />
               </button>
             </div>
             <h1 className="font-[family-name:var(--font-pixel)] text-sm text-habbo-gold pixel-text-shadow mb-1">
@@ -171,6 +232,19 @@ export default function FurniDetailPage({
               >
                 {t.portfolio.addToPortfolio}
               </PixelButton>
+              <PixelButton
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={handleShare}
+              >
+                <span className="flex items-center gap-1.5 justify-center">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Share
+                </span>
+              </PixelButton>
             </div>
           </PixelCard>
 
@@ -181,7 +255,7 @@ export default function FurniDetailPage({
                   {t.furniDetail.avgPrice}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-cyan mt-1">
-                  {formatCredits(data.marketData.averagePrice)}
+                  {formatPrice(data.marketData.averagePrice)}
                 </div>
               </PixelCard>
               <PixelCard className="p-3 text-center">
@@ -221,7 +295,7 @@ export default function FurniDetailPage({
                   {t.furniDetail.high}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-green mt-1">
-                  {formatCredits(maxPrice)}
+                  {formatPrice(maxPrice)}
                 </div>
               </PixelCard>
               <PixelCard className="p-3 text-center">
@@ -229,7 +303,7 @@ export default function FurniDetailPage({
                   {t.furniDetail.low}
                 </div>
                 <div className="text-sm font-mono font-bold text-habbo-red mt-1">
-                  {formatCredits(minPrice)}
+                  {formatPrice(minPrice)}
                 </div>
               </PixelCard>
             </div>
@@ -288,7 +362,9 @@ export default function FurniDetailPage({
             </PixelCard>
           ) : error ? (
             <PixelCard className="p-8 text-center">
-              <div className="text-2xl mb-3 opacity-50">📉</div>
+              <div className="w-12 h-12 mx-auto mb-3 rounded-lg bg-habbo-red/10 border border-habbo-red/20 flex items-center justify-center">
+                <span className="text-habbo-red"><PixelIcon name="chart-down" size="lg" /></span>
+              </div>
               <p className="text-sm text-habbo-text-dim">{error}</p>
             </PixelCard>
           ) : (
@@ -330,8 +406,71 @@ export default function FurniDetailPage({
               )}
             </>
           )}
+          {!loading && !error && data && (
+            <PixelCard className="p-4">
+              <h2 className="font-[family-name:var(--font-pixel)] text-[10px] text-habbo-text-dim uppercase tracking-wider mb-3">
+                Quick Price Alert
+              </h2>
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="flex-1 min-w-[120px]">
+                  <input
+                    type="number"
+                    value={alertTargetPrice}
+                    onChange={(e) => setAlertTargetPrice(e.target.value)}
+                    placeholder="Target price..."
+                    className="w-full px-3 py-2 bg-habbo-input border border-habbo-border rounded text-sm text-habbo-text placeholder:text-habbo-text-dim/50 focus:outline-none focus:border-habbo-cyan/50"
+                    min={1}
+                  />
+                </div>
+                <PixelButton
+                  variant="primary"
+                  size="sm"
+                  onClick={() => handleQuickAlert(AlertDirection.ABOVE)}
+                >
+                  Alert Above
+                </PixelButton>
+                <PixelButton
+                  variant="gold"
+                  size="sm"
+                  onClick={() => handleQuickAlert(AlertDirection.BELOW)}
+                >
+                  Alert Below
+                </PixelButton>
+              </div>
+            </PixelCard>
+          )}
         </div>
       </div>
+
+      {relatedItems.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim uppercase tracking-wider mb-3">
+            Related Items
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {relatedItems.map((item) => (
+              <Link
+                key={item.classname}
+                href={`/furni/${encodeURIComponent(item.classname)}`}
+                className="group bg-habbo-card pixel-border rounded-lg p-3 hover:bg-habbo-card-hover transition-all text-center"
+              >
+                <div className="w-full h-16 flex items-center justify-center mb-2">
+                  <FurniImage
+                    classname={item.classname}
+                    alt={item.name}
+                    size="md"
+                    className="group-hover:scale-110 transition-transform"
+                  />
+                </div>
+                <div className="text-[10px] text-habbo-text truncate">{item.name}</div>
+                {item.rare && (
+                  <span className="text-[7px] font-[family-name:var(--font-pixel)] text-habbo-gold">RARE</span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

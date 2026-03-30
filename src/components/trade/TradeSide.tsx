@@ -3,30 +3,39 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { TradeItem, FurniItem } from "@/lib/types";
 import { HotelDomain } from "@/lib/types";
-import { debounce, formatCredits } from "@/lib/utils";
+import { debounce, formatCredits, formatPrice } from "@/lib/utils";
 import { FurniImage } from "@/components/common/FurniImage";
 import { PixelCard } from "@/components/common/PixelCard";
+import { PixelIcon } from "@/components/common/PixelIcon";
 
 interface TradeSideProps {
   label: string;
   items: TradeItem[];
   total: number;
+  credits: number;
+  onCreditsChange: (value: number) => void;
   onAdd: (classname: string, name: string) => void;
   onRemove: (classname: string) => void;
   onUpdateQuantity: (classname: string, quantity: number) => void;
   searchPlaceholder: string;
   perItemLabel: string;
+  creditsLabel: string;
+  creditsPlaceholder: string;
 }
 
 export function TradeSide({
   label,
   items,
   total,
+  credits,
+  onCreditsChange,
   onAdd,
   onRemove,
   onUpdateQuantity,
   searchPlaceholder,
   perItemLabel,
+  creditsLabel,
+  creditsPlaceholder,
 }: TradeSideProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FurniItem[]>([]);
@@ -43,7 +52,7 @@ export function TradeSide({
       setSearchLoading(true);
       try {
         const res = await fetch(
-          `/api/furnidata?hotel=${HotelDomain.COM}&search=${encodeURIComponent(term)}&limit=8`
+          `/api/furnidata?hotel=${HotelDomain.DE}&search=${encodeURIComponent(term)}&limit=8`
         );
         if (res.ok) {
           const data: FurniItem[] = await res.json();
@@ -84,10 +93,36 @@ export function TradeSide({
           {label}
         </h2>
         <div className="text-xs font-mono text-habbo-gold font-bold">
-          {formatCredits(total)}c
+          {formatCredits(total + credits)}c
         </div>
       </div>
 
+      {/* Credits input */}
+      <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-habbo-gold/5 border border-habbo-gold/20">
+        <span className="text-habbo-gold shrink-0">
+          <PixelIcon name="credits" size="md" />
+        </span>
+        <div className="flex-1 min-w-0">
+          <label className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-gold/70 uppercase tracking-wider block mb-0.5">
+            {creditsLabel}
+          </label>
+          <input
+            type="number"
+            value={credits || ""}
+            onChange={(e) => onCreditsChange(Math.max(0, parseInt(e.target.value) || 0))}
+            placeholder={creditsPlaceholder}
+            min={0}
+            className="w-full bg-transparent border-none text-sm font-mono text-habbo-gold placeholder:text-habbo-gold/30 focus:outline-none p-0"
+          />
+        </div>
+        {credits > 0 && (
+          <div className="text-xs font-mono font-bold text-habbo-gold shrink-0">
+            {formatCredits(credits)}c
+          </div>
+        )}
+      </div>
+
+      {/* Search */}
       <div ref={wrapperRef} className="relative">
         <div className="relative">
           <svg
@@ -138,9 +173,10 @@ export function TradeSide({
         )}
       </div>
 
-      <div className="flex-1 min-h-0 space-y-1 overflow-y-auto max-h-[320px]">
+      {/* Items list */}
+      <div className="flex-1 min-h-0 space-y-1 overflow-y-auto max-h-[280px]">
         {items.length === 0 ? (
-          <div className="text-center py-6 text-habbo-text-dim/50 text-xs">
+          <div className="text-center py-4 text-habbo-text-dim/50 text-xs">
             {searchPlaceholder}
           </div>
         ) : (
@@ -156,14 +192,16 @@ export function TradeSide({
                   {item.loading ? (
                     <span className="inline-block w-3 h-3 border border-habbo-cyan/30 border-t-habbo-cyan rounded-full animate-spin" />
                   ) : (
-                    `${formatCredits(item.avgPrice)}c ${perItemLabel}`
+                    item.avgPrice > 0
+                      ? `${formatCredits(item.avgPrice)}c ${perItemLabel}`
+                      : "N/A"
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onUpdateQuantity(item.classname, item.quantity - 1)}
-                  className="w-5 h-5 rounded bg-habbo-card hover:bg-habbo-card-hover border border-habbo-border text-[10px] text-habbo-text flex items-center justify-center transition-colors"
+                  className="w-7 h-7 sm:w-5 sm:h-5 rounded bg-habbo-card hover:bg-habbo-card-hover border border-habbo-border text-[10px] text-habbo-text flex items-center justify-center transition-colors"
                 >
                   −
                 </button>
@@ -174,18 +212,18 @@ export function TradeSide({
                     const val = parseInt(e.target.value) || 0;
                     if (val > 0) onUpdateQuantity(item.classname, val);
                   }}
-                  className="w-10 text-center bg-habbo-input border border-habbo-border rounded text-[10px] text-habbo-text py-0.5 focus:outline-none focus:border-habbo-cyan/50"
+                  className="w-10 text-center bg-habbo-input border border-habbo-border rounded text-[10px] text-habbo-text py-1 sm:py-0.5 focus:outline-none focus:border-habbo-cyan/50"
                   min={1}
                 />
                 <button
                   onClick={() => onUpdateQuantity(item.classname, item.quantity + 1)}
-                  className="w-5 h-5 rounded bg-habbo-card hover:bg-habbo-card-hover border border-habbo-border text-[10px] text-habbo-text flex items-center justify-center transition-colors"
+                  className="w-7 h-7 sm:w-5 sm:h-5 rounded bg-habbo-card hover:bg-habbo-card-hover border border-habbo-border text-[10px] text-habbo-text flex items-center justify-center transition-colors"
                 >
                   +
                 </button>
               </div>
               <div className="text-right text-xs font-mono text-habbo-gold min-w-[60px]">
-                {item.loading ? "..." : `${formatCredits(item.avgPrice * item.quantity)}c`}
+                {item.loading ? "..." : item.avgPrice > 0 ? `${formatCredits(item.avgPrice * item.quantity)}c` : "N/A"}
               </div>
               <button
                 onClick={() => onRemove(item.classname)}

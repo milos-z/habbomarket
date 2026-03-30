@@ -24,7 +24,7 @@ export function CreateAlertForm({ t }: CreateAlertFormProps) {
   const [selectedItem, setSelectedItem] = useState<FurniItem | null>(null);
   const [targetPrice, setTargetPrice] = useState<number>(0);
   const [direction, setDirection] = useState<AlertDirection>(AlertDirection.BELOW);
-  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.DE);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const search = useCallback(
@@ -36,7 +36,7 @@ export function CreateAlertForm({ t }: CreateAlertFormProps) {
       setSearchLoading(true);
       try {
         const res = await fetch(
-          `/api/furnidata?hotel=${HotelDomain.COM}&search=${encodeURIComponent(term)}&limit=8`
+          `/api/furnidata?hotel=${HotelDomain.DE}&search=${encodeURIComponent(term)}&limit=8`
         );
         if (res.ok) {
           const data: FurniItem[] = await res.json();

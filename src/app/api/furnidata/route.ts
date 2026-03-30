@@ -69,7 +69,7 @@ async function loadFurnidata(hotel: HotelDomain): Promise<FurniItem[]> {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
-    const hotel = (searchParams.get("hotel") as HotelDomain) || HotelDomain.COM;
+    const hotel = (searchParams.get("hotel") as HotelDomain) || HotelDomain.DE;
     const search = searchParams.get("search")?.toLowerCase() ?? "";
     const category = searchParams.get("category") ?? "";
     const furniline = searchParams.get("furniline") ?? "";

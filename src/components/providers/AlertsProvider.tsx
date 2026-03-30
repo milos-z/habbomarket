@@ -13,6 +13,31 @@ import type { PriceAlert } from "@/lib/types";
 import { AlertStatus, AlertDirection } from "@/lib/types";
 import type { HotelDomain } from "@/lib/types";
 import { fetchMarketHistory } from "@/lib/api";
+import { showToast } from "@/components/common/Toast";
+
+function requestNotificationPermission() {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+}
+
+function sendBrowserNotification(title: string, body: string, classname: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  const notification = new Notification(title, {
+    body,
+    icon: `/api/image/${encodeURIComponent(classname)}`,
+    tag: `alert-${classname}`,
+  });
+
+  notification.onclick = () => {
+    window.focus();
+    window.location.href = `/furni/${encodeURIComponent(classname)}`;
+    notification.close();
+  };
+}
 
 const STORAGE_KEY = "habbomarket-alerts";
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
@@ -88,6 +113,15 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
           ((alert.direction === AlertDirection.ABOVE && currentPrice >= alert.targetPrice) ||
             (alert.direction === AlertDirection.BELOW && currentPrice <= alert.targetPrice));
 
+        if (wasTriggered) {
+          showToast(`Alert triggered: ${alert.name} reached ${currentPrice}c`, "warning");
+          sendBrowserNotification(
+            `Price Alert: ${alert.name}`,
+            `${alert.direction === AlertDirection.ABOVE ? "Reached" : "Dropped to"} ${currentPrice}c (target: ${alert.targetPrice}c)`,
+            alert.classname
+          );
+        }
+
         return {
           ...alert,
           currentPrice,
@@ -141,6 +175,8 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
         };
         const next = [...prev, newAlert];
         saveToStorage(next);
+        showToast(`Alert created for "${alertData.name}"`, "success");
+        requestNotificationPermission();
         return next;
       });
     },
@@ -151,6 +187,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
     setAlerts((prev) => {
       const next = prev.filter((a) => a.id !== id);
       saveToStorage(next);
+      showToast("Alert deleted", "info");
       return next;
     });
   }, []);
@@ -161,6 +198,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
         a.id === id ? { ...a, status: AlertStatus.SNOOZED as const } : a
       );
       saveToStorage(next);
+      showToast("Alert snoozed", "info");
       return next;
     });
   }, []);
@@ -173,6 +211,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
           : a
       );
       saveToStorage(next);
+      showToast("Alert reactivated", "success");
       return next;
     });
   }, []);

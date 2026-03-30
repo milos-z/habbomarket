@@ -10,13 +10,19 @@ import { PixelButton } from "@/components/common/PixelButton";
 import { HotelSelector } from "@/components/common/HotelSelector";
 import { TradeSide } from "@/components/trade/TradeSide";
 import { FairnessIndicator } from "@/components/trade/FairnessIndicator";
+import { PixelIcon } from "@/components/common/PixelIcon";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { showToast } from "@/components/common/Toast";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { saveTradeToHistory } from "@/lib/trade-history";
 
 export default function TradePage() {
   const { t } = useLanguage();
-  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.COM);
+  const [hotel, setHotel] = useState<HotelDomain>(HotelDomain.DE);
   const [giveItems, setGiveItems] = useState<TradeItem[]>([]);
   const [receiveItems, setReceiveItems] = useState<TradeItem[]>([]);
+  const [giveCredits, setGiveCredits] = useState(0);
+  const [receiveCredits, setReceiveCredits] = useState(0);
 
   const fetchPrice = useCallback(
     async (classname: string): Promise<number> => {
@@ -81,33 +87,60 @@ export default function TradePage() {
     []
   );
 
-  const giveTotal = useMemo(
+  const giveItemsTotal = useMemo(
     () => giveItems.reduce((sum, i) => sum + i.avgPrice * i.quantity, 0),
     [giveItems]
   );
 
-  const receiveTotal = useMemo(
+  const receiveItemsTotal = useMemo(
     () => receiveItems.reduce((sum, i) => sum + i.avgPrice * i.quantity, 0),
     [receiveItems]
   );
 
+  const giveTotal = giveItemsTotal + giveCredits;
+  const receiveTotal = receiveItemsTotal + receiveCredits;
+
   const anyLoading = giveItems.some((i) => i.loading) || receiveItems.some((i) => i.loading);
 
   function handleSwap() {
-    const tempGive = [...giveItems];
+    const tempItems = [...giveItems];
+    const tempCredits = giveCredits;
     setGiveItems([...receiveItems]);
-    setReceiveItems(tempGive);
+    setGiveCredits(receiveCredits);
+    setReceiveItems(tempItems);
+    setReceiveCredits(tempCredits);
+    showToast("Trade sides swapped", "info");
   }
 
   function handleClear() {
     setGiveItems([]);
     setReceiveItems([]);
+    setGiveCredits(0);
+    setReceiveCredits(0);
+    showToast("Trade cleared", "info");
   }
 
-  const isEmpty = giveItems.length === 0 && receiveItems.length === 0;
+  function handleSaveTrade() {
+    if (giveItems.length === 0 && receiveItems.length === 0 && giveCredits === 0 && receiveCredits === 0) {
+      showToast("Nothing to save", "warning");
+      return;
+    }
+    saveTradeToHistory({
+      giveItems,
+      receiveItems,
+      giveCredits,
+      receiveCredits,
+      giveTotal: giveTotal + giveCredits,
+      receiveTotal: receiveTotal + receiveCredits,
+    });
+    showToast("Trade saved to history", "success");
+  }
+
+  const isEmpty = giveItems.length === 0 && receiveItems.length === 0 && giveCredits === 0 && receiveCredits === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Breadcrumbs segments={[{ label: t.nav.trade }]} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
@@ -125,20 +158,28 @@ export default function TradePage() {
               <PixelButton variant="ghost" size="sm" onClick={handleClear}>
                 {t.trade.clearTrade}
               </PixelButton>
+              <PixelButton variant="gold" size="sm" onClick={handleSaveTrade}>
+                Save Trade
+              </PixelButton>
             </>
           )}
         </div>
       </div>
 
       {isEmpty ? (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">⚖️</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.trade.empty}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.trade.emptyHint}
-          </p>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-cyan/10 border border-habbo-cyan/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-cyan"><PixelIcon name="trade" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.trade.empty}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.trade.emptyHint}
+            </p>
+          </div>
         </PixelCard>
       ) : null}
 
@@ -146,12 +187,16 @@ export default function TradePage() {
         <TradeSide
           label={t.trade.iGive}
           items={giveItems}
-          total={giveTotal}
+          total={giveItemsTotal}
+          credits={giveCredits}
+          onCreditsChange={setGiveCredits}
           onAdd={(c, n) => addItem(setGiveItems, c, n)}
           onRemove={(c) => removeItem(setGiveItems, c)}
           onUpdateQuantity={(c, q) => updateQuantity(setGiveItems, c, q)}
           searchPlaceholder={t.trade.searchToAdd}
           perItemLabel={t.trade.perItem}
+          creditsLabel={t.trade.credits}
+          creditsPlaceholder={t.trade.creditsPlaceholder}
         />
 
         <div className="flex flex-col items-center justify-center gap-3 lg:pt-14">
@@ -174,12 +219,16 @@ export default function TradePage() {
         <TradeSide
           label={t.trade.iReceive}
           items={receiveItems}
-          total={receiveTotal}
+          total={receiveItemsTotal}
+          credits={receiveCredits}
+          onCreditsChange={setReceiveCredits}
           onAdd={(c, n) => addItem(setReceiveItems, c, n)}
           onRemove={(c) => removeItem(setReceiveItems, c)}
           onUpdateQuantity={(c, q) => updateQuantity(setReceiveItems, c, q)}
           searchPlaceholder={t.trade.searchToAdd}
           perItemLabel={t.trade.perItem}
+          creditsLabel={t.trade.credits}
+          creditsPlaceholder={t.trade.creditsPlaceholder}
         />
       </div>
 
@@ -192,6 +241,11 @@ export default function TradePage() {
             <div className="text-sm font-mono font-bold text-habbo-red mt-0.5">
               −{formatCredits(giveTotal)}c
             </div>
+            {giveCredits > 0 && giveItemsTotal > 0 && (
+              <div className="text-[9px] text-habbo-text-dim/60 font-mono mt-0.5">
+                {formatCredits(giveItemsTotal)}c items + {formatCredits(giveCredits)}c
+              </div>
+            )}
           </PixelCard>
           <PixelCard className="px-5 py-3 text-center">
             <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">
@@ -200,6 +254,11 @@ export default function TradePage() {
             <div className="text-sm font-mono font-bold text-habbo-green mt-0.5">
               +{formatCredits(receiveTotal)}c
             </div>
+            {receiveCredits > 0 && receiveItemsTotal > 0 && (
+              <div className="text-[9px] text-habbo-text-dim/60 font-mono mt-0.5">
+                {formatCredits(receiveItemsTotal)}c items + {formatCredits(receiveCredits)}c
+              </div>
+            )}
           </PixelCard>
           <PixelCard className="px-5 py-3 text-center">
             <div className="text-[9px] font-[family-name:var(--font-pixel)] text-habbo-text-dim uppercase">

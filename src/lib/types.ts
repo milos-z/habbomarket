@@ -1,6 +1,13 @@
 export enum HotelDomain {
   COM = "com",
   DE = "de",
+  ES = "es",
+  FR = "fr",
+  IT = "it",
+  FI = "fi",
+  NL = "nl",
+  BR = "com.br",
+  TR = "com.tr",
 }
 
 export enum FurniType {

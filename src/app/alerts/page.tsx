@@ -8,6 +8,8 @@ import { useAlerts } from "@/components/providers/AlertsProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { CreateAlertForm } from "@/components/alerts/CreateAlertForm";
 import { AlertCard } from "@/components/alerts/AlertCard";
+import { PixelIcon } from "@/components/common/PixelIcon";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 
 export default function AlertsPage() {
   const { t } = useLanguage();
@@ -23,6 +25,7 @@ export default function AlertsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Breadcrumbs segments={[{ label: t.nav.alerts }]} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-[family-name:var(--font-pixel)] text-lg text-habbo-gold pixel-text-shadow">
@@ -129,14 +132,19 @@ export default function AlertsPage() {
       )}
 
       {alerts.length === 0 && (
-        <PixelCard className="p-8 text-center">
-          <div className="text-4xl mb-4 opacity-40">🔔</div>
-          <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text-dim mb-2">
-            {t.alerts.empty}
-          </h2>
-          <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
-            {t.alerts.emptyHint}
-          </p>
+        <PixelCard className="p-10 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pixel-grid-bg opacity-20" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-xl bg-habbo-purple/10 border border-habbo-purple/20 flex items-center justify-center animate-float">
+              <span className="text-habbo-purple"><PixelIcon name="alerts" size="xl" /></span>
+            </div>
+            <h2 className="font-[family-name:var(--font-pixel)] text-xs text-habbo-text mb-2">
+              {t.alerts.empty}
+            </h2>
+            <p className="text-sm text-habbo-text-dim/70 max-w-md mx-auto">
+              {t.alerts.emptyHint}
+            </p>
+          </div>
         </PixelCard>
       )}
     </div>
